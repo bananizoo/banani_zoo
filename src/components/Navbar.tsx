@@ -20,6 +20,7 @@ export default function Navbar() {
           <Link href="/favorites">Обране</Link>
           <Link href="/compare">Порівняння</Link>
           <Link href="/cart">Кошик</Link>
+          <Link href="/about">Про нас</Link>
         </div>
 
         <div className="right-block">
