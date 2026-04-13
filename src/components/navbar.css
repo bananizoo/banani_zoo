@@ -9,12 +9,12 @@
 
 /* ====================== СТАТИЧНИЙ СТАН (на початку сторінки) ====================== */
 .navbar.navbar-scrolled {
-  background: rgba(255, 255, 255, 0.822);
+  background: rgba(253, 235, 203, 0.849);
 }
 
 /* ====================== СКРОЛЕНИЙ СТАН ====================== */
 .navbar:not(.navbar-scrolled) {
-  background: rgba(255, 248, 235, 0.98);
+  background: #fee085c9;
   backdrop-filter: blur(20px);
   box-shadow: 0 8px 25px rgba(255, 179, 0, 0.327);
 }
@@ -107,7 +107,7 @@
 .menu-row {
   background: rgba(255, 250, 240, 0.95);
   padding: 12px 40px;
-  border-top: 1px solid #ffe066;
+  border-top: 1px solid #f4d559;
 }
 
 .links {
