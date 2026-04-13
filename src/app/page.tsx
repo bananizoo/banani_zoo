@@ -3,12 +3,19 @@ import ProductCatalog from "@/components/ProductCatalog";
 type HomePageProps = {
   searchParams: Promise<{
     search?: string;
+    sort?: string;
+    petType?: string;
+    productType?: string;
   }>;
 };
 
 export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
+
   const search = params.search || "";
+  const sort = params.sort || "newest";
+  const petType = params.petType || "";
+  const productType = params.productType || "";
 
   return (
     <div>
@@ -21,7 +28,12 @@ export default async function Home({ searchParams }: HomePageProps) {
         </p>
       </section>
 
-      <ProductCatalog search={search} />
+      <ProductCatalog
+        search={search}
+        initialSort={sort}
+        initialPetType={petType}
+        initialProductType={productType}
+      />
     </div>
   );
 }

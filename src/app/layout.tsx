@@ -3,6 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 import { Nunito } from "next/font/google";
+import { Suspense } from "react";
+import type { Metadata } from "next";
 
 const nunito = Nunito({
   subsets: ["latin", "cyrillic"],
@@ -10,7 +12,7 @@ const nunito = Nunito({
   variable: "--font-main",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "BaNaNi — Зоомагазин",
   description: "Яскравий зоомагазин з турботою про твоїх хвостиків 🐾",
   icons: {
@@ -26,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="uk" className={nunito.variable}>
       <body className="min-h-screen bg-[#fffaf0] font-main">
-        <Navbar />
+        <Suspense fallback={<div>Завантаження...</div>}>
+          <Navbar />
+        </Suspense>
 
         <main className="pt-4 pb-12 px-4 max-w-7xl mx-auto relative z-10">
           {children}

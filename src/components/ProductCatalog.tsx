@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type Category = {
   id: string;
@@ -35,10 +35,6 @@ type Product = {
   category: Category;
 };
 
-type ProductCatalogProps = {
-  search: string;
-};
-
 type ProductsResponse = {
   products: Product[];
   searchMeta?: {
@@ -48,25 +44,34 @@ type ProductsResponse = {
   };
 };
 
-export default function ProductCatalog({ search }: ProductCatalogProps) {
+type ProductCatalogProps = {
+  search: string;
+  initialSort?: string;
+  initialPetType?: string;
+  initialProductType?: string;
+};
+
+export default function ProductCatalog({
+  search,
+  initialSort = "newest",
+  initialPetType = "",
+  initialProductType = "",
+}: ProductCatalogProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
-  const [petType, setPetType] = useState(searchParams.get("petType") || "");
-  const [productType, setProductType] = useState(
-    searchParams.get("productType") || ""
-  );
+  const [sort, setSort] = useState(initialSort);
+  const [petType, setPetType] = useState(initialPetType);
+  const [productType, setProductType] = useState(initialProductType);
   const [correctedSearch, setCorrectedSearch] = useState("");
 
   useEffect(() => {
-    setSort(searchParams.get("sort") || "newest");
-    setPetType(searchParams.get("petType") || "");
-    setProductType(searchParams.get("productType") || "");
-  }, [searchParams]);
+    setSort(initialSort);
+    setPetType(initialPetType);
+    setProductType(initialProductType);
+  }, [initialSort, initialPetType, initialProductType]);
 
   useEffect(() => {
     async function loadProducts() {
@@ -176,10 +181,12 @@ export default function ProductCatalog({ search }: ProductCatalogProps) {
     setSort("newest");
     setPetType("");
     setProductType("");
+
     if (search) {
       router.push(`/?search=${encodeURIComponent(search)}`);
       return;
     }
+
     router.push("/");
   }
 
@@ -250,12 +257,8 @@ export default function ProductCatalog({ search }: ProductCatalogProps) {
       </div>
 
       {loading && <p>Завантаження товарів...</p>}
-
       {!loading && error && <p>{error}</p>}
-
-      {!loading && !error && products.length === 0 && (
-        <p>Товарів не знайдено.</p>
-      )}
+      {!loading && !error && products.length === 0 && <p>Товарів не знайдено.</p>}
 
       {!loading && !error && products.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
