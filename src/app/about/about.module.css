@@ -1,329 +1,304 @@
 .page {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 16px 60px;
-  font-family: Arial, sans-serif;
+  padding: 20px 16px 100px;
+  background: #fffaf0;
 }
 
+/* ====================== HERO SECTION ====================== */
 .hero {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 18px;
-  align-items: stretch;
-  margin-top: 10px;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 28px;
+  align-items: start;
+  margin-bottom: 60px;
 }
 
 .heroText {
-  border-radius: 16px;
-  background: #e8f5e9;
-  border: 1px solid #2e7d32;
-  padding: 18px;
+  background: #fffef7;
+  border-radius: 28px;
+  padding: 36px 34px;
+  box-shadow: 0 12px 30px rgba(255, 204, 0, 0.15);
+  border: 3px solid #ffdd55;
+  height: fit-content;
 }
 
 .badge {
   display: inline-block;
-  background: #c8e6c9;
-  border: 1px solid #2e7d32;
-  color: #1b5e20;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  background: #ffcc00;
+  color: #2c2c2c;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-size: 14px;
   font-weight: 700;
+  margin-bottom: 14px;
 }
 
 .title {
-  margin: 12px 0 8px;
-  font-size: 34px;
-  line-height: 1.12;
-  color: #1b5e20;
+  font-size: 38px;
+  line-height: 1.15;
+  color: #2c2c2c;
+  margin: 0 0 18px 0;
 }
 
 .subtitle {
-  margin: 0 0 14px;
-  color: #2f3b2f;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 17px;
+  line-height: 1.65;
+  color: #555;
+  margin-bottom: 24px;
 }
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin: 14px 0 10px;
+  margin-bottom: 28px;
 }
 
 .primaryBtn,
 .secondaryBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  border-radius: 10px;
-  padding: 10px 14px;
+  padding: 13px 26px;
+  border-radius: 16px;
   font-weight: 700;
-  border: 1px solid #2e7d32;
+  font-size: 15.5px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid #ffcc00;
 }
 
 .primaryBtn {
-  background: #2e7d32;
-  color: #ffffff;
+  background: #ffcc00;
+  color: #2c2c2c;
 }
 
 .primaryBtn:hover {
-  filter: brightness(0.95);
+  background: #ff8a00;
+  transform: translateY(-2px);
 }
 
 .secondaryBtn {
-  background: #ffffff;
-  color: #1b5e20;
+  background: transparent;
+  color: #2c2c2c;
 }
 
 .secondaryBtn:hover {
-  background: #f5fff5;
+  background: #fff7e0;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 12px;
+
+
+/* ====================== CTA БЛОК (оновлений - світліший) ====================== */
+.cta {
+  background: linear-gradient(135deg, #fff7e0, #ffebcc);
+  border: 3px solid #ffcc00;
+  border-radius: 28px;
+  padding: 48px 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+  box-shadow: 0 15px 35px rgba(255, 204, 0, 0.18);
+  margin-top: 40px;
 }
 
-.stat {
-  background: #ffffff;
-  border: 1px solid #2e7d32;
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-
-.statValue {
-  font-size: 22px;
+.ctaTitle {
+  font-size: 27px;
   font-weight: 800;
-  color: #1b5e20;
+  color: #2c2c2c;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
 }
 
-.statLabel {
-  font-size: 12px;
-  color: #3a4a3a;
-  margin-top: 2px;
+.ctaText {
+  font-size: 16px;
+  color: #555;
+  margin: 0;
+  max-width: 520px;
 }
 
-.heroCard {
+/* Кнопки молочного кольору */
+.ctaButtons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  padding: 14px 28px;
   border-radius: 16px;
-  background: #ffffff;
-  border: 1px solid #2e7d32;
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
+  font-weight: 700;
+  font-size: 15.5px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid #ffcc00;
+  min-width: 160px;
+  text-align: center;
+}
+
+.primaryBtn {
+  background: #ffcc00;
+  color: #2c2c2c;
+}
+
+.primaryBtn:hover {
+  background: #ffb300;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 180, 0, 0.3);
+}
+
+.secondaryBtn {
+  background: #fffaf0;        /* молочний колір */
+  color: #2c2c2c;
+}
+
+.secondaryBtn:hover {
+  background: #fff7e0;
+  transform: translateY(-3px);
+}
+
+/* ====================== Інші блоки (залишаємо гарний вигляд) ====================== */
+.heroCard {
+  background: #fffef7;
+  border-radius: 28px;
+  padding: 32px 32px 24px;
+  box-shadow: 0 12px 30px rgba(255, 204, 0, 0.12);
+  border: 3px solid #ffdd55;
 }
 
 .cardHeader {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
 }
 
 .logoMark {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  border: 1px solid #2e7d32;
-  background: #fff8e1;
-  display: grid;
-  place-items: center;
-  font-size: 22px;
+  width: 58px;
+  height: 58px;
+  background: #fff7e0;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  border: 2px solid #ffcc00;
 }
 
 .cardTitle {
-  font-weight: 800;
-  color: #1b5e20;
+  font-size: 23px;
+  font-weight: 700;
+  color: #2c2c2c;
 }
 
 .cardSubtitle {
-  font-size: 12px;
-  color: #425242;
-  margin-top: 2px;
+  color: #666;
+  margin-top: 4px;
+  font-size: 15px;
 }
 
 .checklist {
-  margin: 0;
-  padding-left: 18px;
-  color: #2f3b2f;
-  line-height: 1.65;
+  margin: 0 0 10px 0;
+  padding-left: 6px;
+  line-height: 1.85;
+  color: #444;
 }
 
-.note {
-  margin-top: 14px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px dashed #2e7d32;
-  background: #f1fff1;
-  font-size: 12px;
-  color: #2f3b2f;
+.checklist li {
+  margin-bottom: 11px;
+  position: relative;
+  padding-left: 26px;
+}
+
+.checklist li:before {
+  content: "🍌";
+  position: absolute;
+  left: 0;
+  font-size: 18px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
 }
 
 .feature {
-  background: #ffffff;
-  border: 1px solid #2e7d32;
-  border-radius: 16px;
-  padding: 16px;
+  background: white;
+  border-radius: 24px;
+  padding: 28px 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  border: 2px solid #ffe066;
 }
 
 .icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  border: 1px solid #2e7d32;
-  background: #e8f5e9;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-
-.feature h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #1b5e20;
-}
-
-.feature p {
-  margin: 0;
-  color: #2f3b2f;
-  line-height: 1.5;
-  font-size: 14px;
+  width: 62px;
+  height: 62px;
+  background: #fff7e0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin-bottom: 18px;
+  border: 2px solid #ffcc00;
 }
 
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 26px;
+  margin-bottom: 70px;
 }
 
 .block {
-  background: #e8f5e9;
-  border: 1px solid #2e7d32;
-  border-radius: 16px;
-  padding: 16px;
+  background: white;
+  border-radius: 24px;
+  padding: 28px 30px 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  border: 2px solid #ffe066;
 }
 
 .h2 {
-  margin: 0 0 10px;
-  color: #1b5e20;
-  font-size: 20px;
+  font-size: 24px;
+  color: #2c2c2c;
+  margin-bottom: 14px;
 }
 
 .p {
-  margin: 0 0 10px;
-  color: #2f3b2f;
-  line-height: 1.6;
-  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 16px;
 }
 
 .pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .pill {
-  border: 1px solid #2e7d32;
-  background: #ffffff;
-  color: #1b5e20;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.team {
-  display: grid;
-  gap: 10px;
-}
-
-.member {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background: #ffffff;
-  border: 1px solid #2e7d32;
-  border-radius: 14px;
-  padding: 10px 12px;
-}
-
-.avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  border: 1px solid #2e7d32;
-  background: #fff8e1;
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-}
-
-.memberTitle {
-  font-weight: 800;
-  color: #1b5e20;
+  background: #fff7e0;
+  color: #2c2c2c;
+  padding: 8px 18px;
+  border-radius: 9999px;
   font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #ffcc00;
 }
 
-.memberText {
-  font-size: 12px;
-  color: #425242;
-  margin-top: 2px;
-}
-
-.cta {
-  margin-top: 16px;
-  background: #2e7d32;
-  color: #ffffff;
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.ctaTitle {
-  margin: 0;
-  font-size: 20px;
-}
-
-.ctaText {
-  margin: 6px 0 0;
-  opacity: 0.95;
-  font-size: 13px;
-}
-
-.ctaButtons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 900px) {
+/* Responsive */
+@media (max-width: 1024px) {
   .hero {
-    grid-template-columns: 1fr;
-  }
-  .grid {
     grid-template-columns: 1fr;
   }
   .split {
     grid-template-columns: 1fr;
   }
-  .title {
-    font-size: 28px;
+  .cta {
+    flex-direction: column;
+    text-align: center;
   }
 }

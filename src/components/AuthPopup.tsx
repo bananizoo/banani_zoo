@@ -28,17 +28,9 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
 
   async function loadCurrentUser() {
     try {
-      const response = await fetch("/api/auth/me", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        setUser(null);
-        return;
-      }
-
-      const data = await response.json();
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (!res.ok) return setUser(null);
+      const data = await res.json();
       setUser(data.user);
     } catch {
       setUser(null);
@@ -49,17 +41,21 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
     loadCurrentUser();
   }, []);
 
-  async function handleLogin(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!loginEmail || !loginPassword) {
+      setMessage("Усі поля обов'язкові");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           email: loginEmail,
@@ -67,36 +63,39 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         setMessage(data.error || "Помилка входу");
-        setLoading(false);
         return;
       }
 
-      setMessage(data.message || "Вхід виконано успішно");
+      setMessage("Успішно 🎉");
       setLoginEmail("");
       setLoginPassword("");
       await loadCurrentUser();
     } catch {
       setMessage("Помилка сервера");
+    } finally {
+      setLoading(false); // ✅ завжди скидається
     }
-
-    setLoading(false);
   }
 
-  async function handleRegister(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!registerName || !registerEmail || !registerPassword) {
+      setMessage("Усі поля обов'язкові");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           name: registerName,
@@ -105,78 +104,69 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         setMessage(data.error || "Помилка реєстрації");
-        setLoading(false);
         return;
       }
 
-      setMessage(data.message || "Реєстрацію виконано успішно");
+      setMessage("Створено 🎉");
       setRegisterName("");
       setRegisterEmail("");
       setRegisterPassword("");
       await loadCurrentUser();
     } catch {
       setMessage("Помилка сервера");
+    } finally {
+      setLoading(false); // ✅ фікс
     }
-
-    setLoading(false);
   }
 
   async function handleLogout() {
     setLoading(true);
-    setMessage("");
 
     try {
-      const response = await fetch("/api/auth/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setMessage(data.error || "Помилка виходу");
-        setLoading(false);
-        return;
-      }
-
       setUser(null);
-      setMessage(data.message || "Вихід виконано успішно");
     } catch {
-      setMessage("Помилка сервера");
+      setMessage("Помилка");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
     <div className="auth-popup">
       <button className="auth-close" onClick={onClose}>
-        ×
+        ✕
       </button>
 
       {user ? (
-        <div>
-          <h3>Профіль</h3>
-          <p><strong>Ім’я:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+        <div className="profile-view">
+          <div className="avatar-big">🐵</div>
+          <h3>{user.name}</h3>
+          <p>{user.email}</p>
 
-          <button onClick={handleLogout} disabled={loading}>
-            {loading ? "Завантаження..." : "Вийти"}
+          <button onClick={handleLogout}>
+            {loading ? "..." : "Вийти"}
           </button>
         </div>
       ) : (
-        <div>
+        <>
           <div className="auth-tabs">
-            <button onClick={() => setMode("login")} disabled={mode === "login"}>
+            <button
+              onClick={() => setMode("login")}
+              className={mode === "login" ? "active" : ""}
+            >
               Увійти
             </button>
             <button
               onClick={() => setMode("register")}
-              disabled={mode === "register"}
+              className={mode === "register" ? "active" : ""}
             >
               Реєстрація
             </button>
@@ -184,60 +174,51 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
 
           {mode === "login" ? (
             <form onSubmit={handleLogin} className="auth-form">
-              <h3>Увійти</h3>
-
               <input
                 type="email"
                 placeholder="Email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
               />
-
               <input
                 type="password"
                 placeholder="Пароль"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
               />
-
               <button type="submit" disabled={loading}>
-                {loading ? "Завантаження..." : "Увійти"}
+                {loading ? "..." : "Увійти"}
               </button>
             </form>
           ) : (
             <form onSubmit={handleRegister} className="auth-form">
-              <h3>Реєстрація</h3>
-
               <input
                 type="text"
-                placeholder="Ім’я"
+                placeholder="Ім'я"
                 value={registerName}
                 onChange={(e) => setRegisterName(e.target.value)}
               />
-
               <input
                 type="email"
                 placeholder="Email"
                 value={registerEmail}
                 onChange={(e) => setRegisterEmail(e.target.value)}
               />
-
               <input
                 type="password"
                 placeholder="Пароль"
                 value={registerPassword}
                 onChange={(e) => setRegisterPassword(e.target.value)}
               />
-
               <button type="submit" disabled={loading}>
-                {loading ? "Завантаження..." : "Зареєструватися"}
+                {loading ? "..." : "Зареєструватися"}
               </button>
             </form>
           )}
-        </div>
-      )}
 
-      {message && <p className="auth-message">{message}</p>}
+          {message && <p className="auth-message">{message}</p>}
+        </>
+      )}
     </div>
   );
 }

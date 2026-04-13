@@ -1,26 +1,305 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #fffaf0;
+  --accent: #ffcc00;
+  --accent-dark: #ff8a00;
+  --soft-green: #86efac;
+  --text: #2c2c2c;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-main), sans-serif;
+
+  background: rgba(255, 255, 255, 0.822);
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.204), rgba(255, 255, 255, 0.308)),
+    url('/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;          
+  min-height: 100vh;
+}
+
+.font-main {
+  font-family: var(--font-main), sans-serif;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+}
+
+/* 📊 РЯДОК СТАТИСТИКИ */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+/* 🔥 БЕЙДЖ */
+.stat-highlight {
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #ff8a00;
+
+  padding: 4px 12px;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #ffcc00, #ffe082);
+
+  box-shadow: 
+    0 4px 10px rgba(255, 204, 0, 0.4),
+    0 0 10px rgba(255, 204, 0, 0.5);
+
+  min-width: 55px;
+  text-align: center;
+}
+
+/* Красиві картки */
+.card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 2px solid #ffcc00;
+  overflow: hidden;
+}
+
+.auth-popup {
+  position: fixed !important;
+
+  top: 90px !important;
+  right: 20px !important;
+
+  width: 320px;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  z-index: 99999 !important;
+}
+
+/* ❌ Кнопка закриття */
+.auth-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #f3f3f3;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 15px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 999px; /* 🔥 робить овальними */
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.auth-tabs .active {
+  background: #ffcc00;
+  color: #2c2c2c;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.auth-tabs button:hover {
+  background: rgba(255, 204, 0, 0.2);
+}
+
+/* 📝 Форма */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.auth-form button {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #ffcc00;
+  cursor: pointer;
+}
+
+/* 👤 Профіль */
+.profile-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.avatar-big {
+  font-size: 40px;
+}
+
+/* ⚠️ Повідомлення */
+.auth-message {
+  margin-top: 10px;
+  color: red;
+}
+
+/* 🔐 overlay */
+.auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 📦 popup */
+.auth-popup {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 350px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+/* ❌ close */
+.auth-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* 🔄 tabs */
+.auth-tabs {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+}
+
+.auth-tabs .active {
+  background: #ffcc00;
+  font-weight: bold;
+}
+
+/* 📝 form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.auth-form button {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #ffcc00;
+  cursor: pointer;
+}
+
+/* 👤 profile */
+.profile-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.avatar-big {
+  font-size: 40px;
+}
+
+/* ⚠️ message */
+.auth-message {
+  margin-top: 10px;
+  color: red;
+}
+
+.footer {
+  position: relative;
+}
+
+/* ✨ glow для навігації */
+.footer-links a {
+  transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: rgb(249, 97, 15);
+  text-shadow: 0 0 8px rgba(255,255,255,0.9);
+}
+
+/* 🔘 соц іконки */
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+
+  font-size: 18px;
+
+  transition: all 0.3s ease;
+}
+
+/* Instagram */
+.social-icon:nth-child(1):hover {
+  background: #e1306c;
+  color: white;
+  box-shadow: 0 0 15px #e1306c;
+}
+
+/* TikTok */
+.social-icon:nth-child(2):hover {
+  background: #000;
+  color: #00f2ea;
+  box-shadow: 0 0 15px #00f2ea;
+}
+
+/* Telegram */
+.social-icon:nth-child(3):hover {
+  background: #0088cc;
+  color: white;
+  box-shadow: 0 0 15px #0088cc;
 }
