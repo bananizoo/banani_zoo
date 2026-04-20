@@ -15,6 +15,7 @@ type UserType = {
 export default function AuthPopup({ onClose }: AuthPopupProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [user, setUser] = useState<UserType | null>(null);
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -27,13 +28,22 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
   const [loading, setLoading] = useState(false);
 
   async function loadCurrentUser() {
+    setIsCheckingUser(true);
+
     try {
       const res = await fetch("/api/auth/me", { credentials: "include" });
-      if (!res.ok) return setUser(null);
+
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+
       const data = await res.json();
       setUser(data.user);
     } catch {
       setUser(null);
+    } finally {
+      setIsCheckingUser(false);
     }
   }
 
@@ -77,7 +87,7 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
     } catch {
       setMessage("Помилка сервера");
     } finally {
-      setLoading(false); // ✅ завжди скидається
+      setLoading(false);
     }
   }
 
@@ -119,7 +129,7 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
     } catch {
       setMessage("Помилка сервера");
     } finally {
-      setLoading(false); // ✅ фікс
+      setLoading(false);
     }
   }
 
@@ -131,7 +141,10 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
         method: "POST",
         credentials: "include",
       });
+
       setUser(null);
+      setMessage("");
+      setMode("login");
     } catch {
       setMessage("Помилка");
     } finally {
@@ -145,7 +158,11 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
         ✕
       </button>
 
-      {user ? (
+      {isCheckingUser ? (
+        <div className="profile-view">
+          <p>Завантаження...</p>
+        </div>
+      ) : user ? (
         <div className="profile-view">
           <div className="avatar-big">🐵</div>
           <h3>{user.name}</h3>

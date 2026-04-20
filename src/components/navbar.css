@@ -131,3 +131,7 @@
   color: #ff8a00;
   transform: translateY(-2px);
 }
+
+.auth-popup button {
+  cursor: pointer;
+}

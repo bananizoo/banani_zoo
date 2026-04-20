@@ -190,6 +190,32 @@ export default function ProductCatalog({
     router.push("/");
   }
 
+  async function handleAddToCart(productId: string) {
+  try {
+    const response = await fetch("/api/cart/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        productId,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      alert(data?.error || "Не вдалося додати товар у кошик");
+      return;
+    }
+
+    window.dispatchEvent(new Event("cart-updated"));
+    window.dispatchEvent(new Event("cart-item-added"));
+  } catch {
+    alert("Помилка при додаванні товару у кошик");
+  }
+}
+
   return (
     <section className="mt-8">
       <div className="mb-4">
@@ -354,6 +380,7 @@ export default function ProductCatalog({
 
                 <button
                   type="button"
+                  onClick={() => handleAddToCart(product.id)}
                   className="px-4 py-2 rounded-xl bg-yellow-300 hover:bg-yellow-400 transition"
                 >
                   У кошик

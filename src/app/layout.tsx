@@ -6,6 +6,8 @@ import { Nunito } from "next/font/google";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import CartDrawer from "@/components/CartDrawer";
+
 const nunito = Nunito({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
@@ -37,6 +39,8 @@ export default function RootLayout({
         </main>
 
         <Footer />
+
+        <CartDrawer />
       </body>
     </html>
   );
