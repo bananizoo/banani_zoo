@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const fetch = global.fetch;
 
 const BASE_URL = "https://bananizoo.vercel.app";
 
