@@ -5,7 +5,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/bananizoo/banani_zoo.git'
+                git branch: 'main',
+            url: 'https://github.com/bananizoo/banani_zoo.git'
             }
         }
 
