@@ -5,26 +5,25 @@ pipeline {
 
         stage('Install') {
             steps {
-                bat 'npm install'
+                sh 'npm install'
+                sh 'npx playwright install'
             }
         }
 
-        stage('Test') {
+        stage('Run tests') {
             steps {
-                bat 'npm test'
+                sh 'npx playwright test'
             }
         }
     }
 
     post {
         always {
-            echo 'Tests finished'
-        }
-        success {
-            echo 'All tests passed'
-        }
-        failure {
-            echo 'Some tests failed'
+            publishHTML([
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'BananiZoo Report'
+            ])
         }
     }
 }
