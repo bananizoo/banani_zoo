@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import "./navbar.css";
 import AuthPopup from "./AuthPopup";
 
@@ -14,6 +14,7 @@ export default function Navbar() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname(); // 🔥 ВАЖЛИВО
 
   useEffect(() => {
     const currentSearch = searchParams.get("search") || "";
@@ -40,6 +41,11 @@ export default function Navbar() {
     }
 
     router.push(`/?search=${encodeURIComponent(trimmedSearch)}`);
+  }
+
+  // 🔥 функція для активного лінка
+  function getLinkClass(path: string) {
+    return pathname === path ? "active-link" : "";
   }
 
   return (
@@ -90,12 +96,12 @@ export default function Navbar() {
 
       <div className="menu-row">
         <div className="links">
-          <Link href="/">Головна</Link>
-          <Link href="/about">Про нас</Link>
-          <Link href="/calculator">Калькулятор</Link>
-          <Link href="/favorites">Обране</Link>
-          <Link href="/compare">Порівняння</Link>
-          <Link href="/cart">Кошик 🛒</Link>
+          <Link href="/" className={getLinkClass("/")}>Головна</Link>
+          <Link href="/about" className={getLinkClass("/about")}>Про нас</Link>
+          <Link href="/calculator" className={getLinkClass("/calculator")}>Калькулятор</Link>
+          <Link href="/favorites" className={getLinkClass("/favorites")}>Обране</Link>
+          <Link href="/compare" className={getLinkClass("/compare")}>Порівняння</Link>
+          {/* ❌ КОШИК ВИДАЛИЛИ */}
         </div>
       </div>
 

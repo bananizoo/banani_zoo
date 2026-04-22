@@ -23,6 +23,28 @@
   background: transparent;   /* прибираємо додатковий фон при скролі */
 }
 
+/* 🔥 АКТИВНА СТОРІНКА */
+.links a.active-link {
+  color: #ff8a00;
+  position: relative;
+}
+
+.links a.active-link::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #ffcc00;
+  border-radius: 2px;
+}
+
+/* плавний ефект */
+.links a {
+  position: relative;
+}
+
 /* ====================== TOP ROW ====================== */
 .top-row {
   display: flex;

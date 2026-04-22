@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL") // 🔥 ВАЖЛИВО — цього не вистачало
 }
 
 enum ProductType {
@@ -146,7 +147,7 @@ model Product {
 
 model Order {
   id            String       @id @default(cuid())
-  orderNumber Int @unique @default(autoincrement())
+  orderNumber   Int          @unique @default(autoincrement())
   userId        String
   customerName  String
   customerPhone String

@@ -25,7 +25,6 @@ export default function CartDrawer() {
   const [loading, setLoading] = useState(false);
 
   const [confirmProductId, setConfirmProductId] = useState<string | null>(null);
-
   const [showAddedMessage, setShowAddedMessage] = useState(false);
 
   async function loadCart() {
@@ -61,12 +60,12 @@ export default function CartDrawer() {
     }
 
     function handleCartItemAdded() {
-        loadCart();
-        setShowAddedMessage(true);
-        
-        setTimeout(() => {
-            setShowAddedMessage(false);
-        }, 2500);
+      loadCart();
+      setShowAddedMessage(true);
+
+      setTimeout(() => {
+        setShowAddedMessage(false);
+      }, 2500);
     }
 
     window.addEventListener("cart-updated", handleCartUpdated);
@@ -74,21 +73,16 @@ export default function CartDrawer() {
 
     return () => {
       window.removeEventListener("cart-updated", handleCartUpdated);
-      window.addEventListener("cart-item-added", handleCartItemAdded);
+      window.removeEventListener("cart-item-added", handleCartItemAdded);
     };
   }, []);
 
   async function increaseQuantity(productId: string, currentQuantity: number) {
     await fetch("/api/cart/item", {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        productId,
-        quantity: currentQuantity + 1,
-      }),
+      body: JSON.stringify({ productId, quantity: currentQuantity + 1 }),
     });
 
     await loadCart();
@@ -106,14 +100,9 @@ export default function CartDrawer() {
   async function updateQuantity(productId: string, quantity: number) {
     await fetch("/api/cart/item", {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        productId,
-        quantity,
-      }),
+      body: JSON.stringify({ productId, quantity }),
     });
 
     await loadCart();
@@ -122,13 +111,9 @@ export default function CartDrawer() {
   async function removeItem(productId: string) {
     await fetch("/api/cart/item", {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        productId,
-      }),
+      body: JSON.stringify({ productId }),
     });
 
     setConfirmProductId(null);
@@ -139,219 +124,143 @@ export default function CartDrawer() {
 
   return (
     <>
+      {/* 🔔 Повідомлення */}
       {showAddedMessage && (
-        <div
-           style={{
-             position: "fixed",
-             right: "20px",
-             bottom: "95px",
-             background: "#fff",
-             border: "1px solid #ccc",
-             padding: "12px 16px",
-             zIndex: 1002,
-             boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-           }}
-         >
-           Товар додано до кошика
-
+        <div className="fixed right-6 bottom-24 bg-yellow-100 border border-yellow-300 px-4 py-3 rounded-xl shadow-lg z-[1002] animate-bounce">
+          🛒 Товар додано до кошика
         </div>
       )}
+
+      {/* 🛒 КНОПКА */}
       <button
-        type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        style={{
-          position: "fixed",
-          right: "20px",
-          bottom: "20px",
-          width: "64px",
-          height: "64px",
-          border: "1px solid #ccc",
-          background: "#fff",
-          cursor: "pointer",
-          zIndex: 1000,
-        }}
+        className="fixed right-6 bottom-6 w-24 h-24 rounded-full bg-yellow-200 hover:bg-yellow-400 shadow-xl flex items-center justify-center text-2xl z-[1000] transition transform hover:scale-110"
       >
         🛒
+
         {totalItemsCount > 0 && (
-          <span
-            style={{
-              position: "absolute",
-              top: "-8px",
-              right: "-8px",
-              minWidth: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              background: "#facc15",
-              border: "1px solid #999",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-            }}
-          >
+          <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow">
             {totalItemsCount}
           </span>
         )}
       </button>
 
+      {/* 📦 DRAWER */}
       <div
-        style={{
-          position: "fixed",
-          top: 0,
-          right: isOpen ? 0 : "-30%",
-          width: "30%",
-          minWidth: "320px",
-          height: "100vh",
-          background: "#fff",
-          borderLeft: "1px solid #ddd",
-          transition: "right 0.3s ease",
-          zIndex: 1001,
-          padding: "20px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-        }}
+        className={`fixed top-0 right-0 h-full w-[360px] bg-yellow-50 border-l-2 border-yellow-300 shadow-2xl z-[1001] transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
-        >
-          <h2>Кошик</h2>
+        <div className="p-5 flex flex-col h-full">
+          {/* HEADER */}
+          <div className="flex justify-between items-center mb-5">
+            <h2 className="text-2xl font-bold">Кошик 🛒</h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-xl hover:text-red-500"
+            >
+              ✕
+            </button>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            style={{
-              cursor: "pointer",
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
-        {loading ? (
-          <p>Завантаження...</p>
-        ) : items.length === 0 ? (
-          <p>Кошик порожній</p>
-        ) : (
-          <>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "12px",
-                  marginBottom: "12px",
-                }}
-              >
-                <p>
-                  <strong>{item.productName}</strong>
-                </p>
-
-                <p>Ціна: {item.price} грн</p>
-                <p>Кількість: {item.quantity}</p>
-                <p>Сума: {(item.price * item.quantity).toFixed(2)} грн</p>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    alignItems: "center",
-                    marginTop: "10px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => decreaseQuantity(item.productId, item.quantity)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    -
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => increaseQuantity(item.productId, item.quantity)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    +
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setConfirmProductId(item.productId)}
-                    style={{
-                      marginLeft: "auto",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Видалити
-                  </button>
-                </div>
-
-                {confirmProductId === item.productId && (
+          {/* CONTENT */}
+          <div className="flex-1 overflow-y-auto pr-1">
+            {loading ? (
+              <p>Завантаження...</p>
+            ) : items.length === 0 ? (
+              <p className="text-gray-500">Кошик порожній</p>
+            ) : (
+              <div className="space-y-4">
+                {items.map((item) => (
                   <div
-                    style={{
-                      marginTop: "12px",
-                      border: "1px solid #ddd",
-                      padding: "10px",
-                    }}
+                    key={item.id}
+                    className="bg-white rounded-2xl border border-yellow-300 p-4 shadow-sm"
                   >
-                    <p>Дійсно хочете видалити з кошика?</p>
+                    <p className="font-semibold">{item.productName}</p>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        marginTop: "10px",
-                      }}
-                    >
+                    <p className="text-sm text-gray-600">
+                      {item.price} грн × {item.quantity}
+                    </p>
+
+                    <p className="font-bold text-orange-500 mt-1">
+                      {(item.price * item.quantity).toFixed(2)} грн
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-3">
                       <button
-                        type="button"
-                        onClick={() => removeItem(item.productId)}
-                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          decreaseQuantity(item.productId, item.quantity)
+                        }
+                        className="px-3 py-1 rounded-lg bg-yellow-200 hover:bg-yellow-300"
                       >
-                        Так
+                        −
                       </button>
 
                       <button
-                        type="button"
-                        onClick={() => setConfirmProductId(null)}
-                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          increaseQuantity(item.productId, item.quantity)
+                        }
+                        className="px-3 py-1 rounded-lg bg-yellow-200 hover:bg-yellow-300"
                       >
-                        Ні
+                        +
+                      </button>
+
+                      <button
+                        onClick={() => setConfirmProductId(item.productId)}
+                        className="ml-auto text-sm text-red-500 hover:underline"
+                      >
+                        Видалити
                       </button>
                     </div>
+
+                    {confirmProductId === item.productId && (
+                      <div className="mt-3 bg-yellow-100 p-3 rounded-lg border border-yellow-300">
+                        <p className="text-sm">
+                          Видалити товар з кошика?
+                        </p>
+
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => removeItem(item.productId)}
+                            className="px-3 py-1 bg-red-500 text-white rounded-lg"
+                          >
+                            Так
+                          </button>
+
+                          <button
+                            onClick={() => setConfirmProductId(null)}
+                            className="px-3 py-1 bg-gray-200 rounded-lg"
+                          >
+                            Ні
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
+            )}
+          </div>
 
-            <hr style={{ margin: "16px 0" }} />
+          {/* FOOTER */}
+          {items.length > 0 && (
+            <div className="pt-4 border-t border-yellow-300">
+              <h3 className="text-lg font-bold mb-3">
+                Разом: {totalPrice.toFixed(2)} грн
+              </h3>
 
-            <h3>Загальна вартість: {totalPrice.toFixed(2)} грн</h3>
-            <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              window.location.href = "/checkout";
-            }}
-            style={{
-              marginTop: "12px",
-              cursor: "pointer",
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              background: "#facc15",
-            }}
-          >
-            Оформити замовлення
-          </button>
-          </>
-        )}
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  window.location.href = "/checkout";
+                }}
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold py-3 rounded-xl shadow"
+              >
+                Оформити замовлення
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
