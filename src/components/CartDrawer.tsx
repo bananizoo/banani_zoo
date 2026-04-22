@@ -166,7 +166,7 @@ export default function CartDrawer() {
           {/* CONTENT */}
           <div className="flex-1 overflow-y-auto pr-1">
             {loading ? (
-              <p>Завантаження...</p>
+              <p>Завантаження....</p>
             ) : items.length === 0 ? (
               <p className="text-gray-500">Кошик порожній</p>
             ) : (
