@@ -3,20 +3,13 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-            url: 'https://github.com/bananizoo/banani_zoo.git'
-            }
-        }
-
-        stage('Install dependencies') {
+        stage('Install') {
             steps {
                 bat 'npm install'
             }
         }
 
-        stage('Run tests') {
+        stage('Test') {
             steps {
                 bat 'npm test'
             }
@@ -25,13 +18,11 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline finished'
+            echo 'Tests finished'
         }
-
         success {
-            echo 'Tests executed successfully'
+            echo 'All tests passed'
         }
-
         failure {
             echo 'Some tests failed'
         }
