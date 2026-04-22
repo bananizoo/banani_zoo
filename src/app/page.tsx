@@ -10,11 +10,13 @@ type HomePageProps = {
   };
 };
 
-export default function Home({ searchParams }: HomePageProps) {
-  const search = searchParams.search || "";
-  const sort = searchParams.sort || "newest";
-  const petType = searchParams.petType || "";
-  const productType = searchParams.productType || "";
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+
+  const search = params.search || "";
+  const sort = params.sort || "newest";
+  const petType = params.petType || "";
+  const productType = params.productType || "";
 
   return (
     <div className="space-y-12 text-[17px]">
