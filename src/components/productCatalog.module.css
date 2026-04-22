@@ -1,0 +1,200 @@
+/* WRAPPER */
+.wrapper {
+  margin-top: 40px;
+
+  background: linear-gradient(135deg, #fffaf0, #fff6dc);
+  border-radius: 32px;
+  padding: 28px;
+
+  border: 2px solid rgba(255, 200, 0, 0.5);
+
+  box-shadow:
+    0 15px 40px rgba(255, 180, 0, 0.18),
+    0 0 20px rgba(255, 200, 0, 0.1);
+}
+
+/* TITLE */
+.title {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* FILTERS */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.filters select {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #f3d58a;
+  background: #fffdf7;
+  font-size: 14px;
+
+  transition: 0.2s;
+}
+
+.filters select:focus {
+  outline: none;
+  border-color: #facc15;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
+}
+
+.filters button {
+  background: #facc15;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+
+  transition: 0.2s;
+}
+
+.filters button:hover {
+  background: #fbbf24;
+  transform: translateY(-1px);
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* CARD */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  border: 1.5px solid #fde68a;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 10px 20px rgba(0,0,0,0.1),
+    0 0 20px rgba(255, 200, 0, 0.3);
+}
+
+/* BADGES */
+.badges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Пастельні кольори */
+.badgeType {
+  background: #fff1cc;   /* ніжно-жовтий */
+  color: #b45309;
+}
+
+.badgePet {
+  background: #e6f4ea;   /* ніжно-зелений */
+  color: #2f855a;
+}
+
+/* NAME */
+.name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* DESC */
+.desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* INFO */
+.info {
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: #444;
+}
+
+.info p {
+  margin-bottom: 3px;
+}
+
+/* BOTTOM */
+.bottom {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* PRICE */
+.price {
+  color: #f59e0b;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* BUTTON */
+.card button {
+  background: #facc15;
+  border-radius: 10px;
+  padding: 7px 14px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+
+  transition: 0.2s;
+}
+
+.card button:hover {
+  background: #fbbf24;
+  transform: scale(1.03);
+}
+
+.loadMore {
+  background: #ffcc00;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.loadMore:hover {
+  background: #ffb300;
+}

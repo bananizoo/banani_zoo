@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import styles from "./productCatalog.module.css";
 
 type Category = {
   id: string;
@@ -21,373 +22,216 @@ type Product = {
   productType: string;
   petType: string;
   ageGroup: string;
-  foodType: string | null;
-  caloriesPer100g: number | null;
-  feedingMinGPerDay: number | null;
-  feedingMaxGPerDay: number | null;
-  recommendedWeightMinKg: number | null;
-  recommendedWeightMaxKg: number | null;
   sizeLabel: string | null;
   neckMinCm: number | null;
   neckMaxCm: number | null;
   chestMinCm: number | null;
   chestMaxCm: number | null;
+  recommendedWeightMinKg: number | null;
+  recommendedWeightMaxKg: number | null;
   category: Category;
 };
 
 type ProductsResponse = {
   products: Product[];
-  searchMeta?: {
-    rawSearch?: string;
-    correctedSearch?: string;
-    searchTerms?: string[];
+  pagination?: {
+    page: number;
+    totalPages: number;
   };
 };
 
-type ProductCatalogProps = {
-  search: string;
-  initialSort?: string;
-  initialPetType?: string;
-  initialProductType?: string;
-};
-
-export default function ProductCatalog({
-  search,
-  initialSort = "newest",
-  initialPetType = "",
-  initialProductType = "",
-}: ProductCatalogProps) {
+export default function ProductCatalog() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // ✅ беремо search прямо з URL (ФІКС)
+  const search = searchParams.get("search") || "";
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [sort, setSort] = useState(initialSort);
-  const [petType, setPetType] = useState(initialPetType);
-  const [productType, setProductType] = useState(initialProductType);
-  const [correctedSearch, setCorrectedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
+  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
+  const [petType, setPetType] = useState(searchParams.get("petType") || "");
+  const [productType, setProductType] = useState(searchParams.get("productType") || "");
+
+  // 🔄 завантаження товарів
   useEffect(() => {
-    setSort(initialSort);
-    setPetType(initialPetType);
-    setProductType(initialProductType);
-  }, [initialSort, initialPetType, initialProductType]);
-
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        setLoading(true);
-        setError("");
-        setCorrectedSearch("");
-
-        const params = new URLSearchParams();
-
-        if (search) {
-          params.set("search", search);
-        }
-
-        if (sort) {
-          params.set("sort", sort);
-        }
-
-        if (petType) {
-          params.set("petType", petType);
-        }
-
-        if (productType) {
-          params.set("productType", productType);
-        }
-
-        const response = await fetch(`/api/products?${params.toString()}`, {
-          cache: "no-store",
-        });
-
-        const data: ProductsResponse = await response.json();
-
-        if (!response.ok) {
-          setError("Помилка завантаження товарів");
-          setProducts([]);
-          return;
-        }
-
-        setProducts(data.products || []);
-
-        if (
-          data.searchMeta?.rawSearch &&
-          data.searchMeta?.correctedSearch &&
-          data.searchMeta.rawSearch.toLowerCase() !==
-            data.searchMeta.correctedSearch.toLowerCase()
-        ) {
-          setCorrectedSearch(data.searchMeta.correctedSearch);
-        }
-      } catch {
-        setError("Помилка завантаження товарів");
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProducts();
+    loadProducts(1, true);
   }, [search, sort, petType, productType]);
 
-  function applyFilters(nextValues?: {
-    sort?: string;
-    petType?: string;
-    productType?: string;
-  }) {
+  async function loadProducts(pageToLoad: number, reset = false) {
     const params = new URLSearchParams();
 
-    const nextSort = nextValues?.sort ?? sort;
-    const nextPetType = nextValues?.petType ?? petType;
-    const nextProductType = nextValues?.productType ?? productType;
+    params.set("search", search); // ✅ FIX
+    params.set("sort", sort);
+    params.set("page", String(pageToLoad));
 
-    if (search) {
-      params.set("search", search);
+    if (petType) params.set("petType", petType);
+    if (productType) params.set("productType", productType);
+
+    const res = await fetch(`/api/products?${params.toString()}`, {
+      cache: "no-store",
+    });
+
+    const data: ProductsResponse = await res.json();
+
+    if (reset) {
+      setProducts(data.products || []);
+    } else {
+      setProducts((prev) => [...prev, ...(data.products || [])]);
     }
 
-    if (nextSort) {
-      params.set("sort", nextSort);
-    }
-
-    if (nextPetType) {
-      params.set("petType", nextPetType);
-    }
-
-    if (nextProductType) {
-      params.set("productType", nextProductType);
-    }
-
-    const queryString = params.toString();
-    router.push(queryString ? `/?${queryString}` : "/");
+    setPage(pageToLoad);
+    setHasMore(pageToLoad < (data.pagination?.totalPages || 1));
   }
 
-  function handleSortChange(value: string) {
-    setSort(value);
-    applyFilters({ sort: value });
-  }
+  // 🔁 оновлення URL
+  function applyFilters(next: any) {
+    const params = new URLSearchParams();
 
-  function handlePetTypeChange(value: string) {
-    setPetType(value);
-    applyFilters({ petType: value });
-  }
+    const nextSort = next?.sort ?? sort;
+    const nextPet = next?.petType ?? petType;
+    const nextType = next?.productType ?? productType;
 
-  function handleProductTypeChange(value: string) {
-    setProductType(value);
-    applyFilters({ productType: value });
+    params.set("search", search); // ✅ FIX (не губиться)
+
+    if (nextSort) params.set("sort", nextSort);
+    if (nextPet) params.set("petType", nextPet);
+    if (nextType) params.set("productType", nextType);
+
+    router.push(`/?${params.toString()}`);
   }
 
   function resetFilters() {
-    setSort("newest");
-    setPetType("");
-    setProductType("");
-
-    if (search) {
-      router.push(`/?search=${encodeURIComponent(search)}`);
-      return;
-    }
-
     router.push("/");
   }
 
   async function handleAddToCart(productId: string) {
-  try {
-    const response = await fetch("/api/cart/add", {
+    await fetch("/api/cart/add", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: JSON.stringify({ productId }),
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        productId,
-      }),
     });
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => null);
-      alert(data?.error || "Не вдалося додати товар у кошик");
-      return;
-    }
-
-    window.dispatchEvent(new Event("cart-updated"));
     window.dispatchEvent(new Event("cart-item-added"));
-  } catch {
-    alert("Помилка при додаванні товару у кошик");
   }
-}
 
   return (
-    <section className="mt-8">
-      <div className="mb-4">
-        <h2 className="text-3xl font-bold">Каталог товарів</h2>
+    <section className={styles.wrapper}>
+      <h2 className={styles.title}>Каталог товарів</h2>
 
-        {search ? (
-          <p className="text-sm mt-2">
-            Результати пошуку за запитом: <strong>{search}</strong>
-          </p>
-        ) : (
-          <p className="text-sm mt-2">Усі доступні товари</p>
-        )}
-
-        {correctedSearch && (
-          <p className="text-sm mt-2 text-orange-700">
-            Пошук виправлено на: <strong>{correctedSearch}</strong>
-          </p>
-        )}
-      </div>
-
-      <div className="mb-6 flex gap-3 flex-wrap items-center">
+      <div className={styles.filters}>
         <select
           value={petType}
-          onChange={(e) => handlePetTypeChange(e.target.value)}
-          className="border rounded-xl px-3 py-2 bg-white"
+          onChange={(e) => {
+            setPetType(e.target.value);
+            applyFilters({ petType: e.target.value });
+          }}
         >
           <option value="">Усі тварини</option>
-          <option value="CAT">Коти</option>
           <option value="DOG">Собаки</option>
+          <option value="CAT">Коти</option>
         </select>
 
         <select
           value={productType}
-          onChange={(e) => handleProductTypeChange(e.target.value)}
-          className="border rounded-xl px-3 py-2 bg-white"
+          onChange={(e) => {
+            setProductType(e.target.value);
+            applyFilters({ productType: e.target.value });
+          }}
         >
           <option value="">Усі товари</option>
           <option value="FOOD">Корм</option>
           <option value="HARNESS">Шлейки</option>
-          <option value="ACCESSORY">Аксесуари</option>
           <option value="TOY">Іграшки</option>
-          <option value="HYGIENE">Гігієна</option>
+          <option value="ACCESSORY">Аксесуари</option> {/* ✅ FIX */}
+          <option value="HYGIENE">Гігієна</option> {/* ✅ FIX */}
         </select>
 
         <select
           value={sort}
-          onChange={(e) => handleSortChange(e.target.value)}
-          className="border rounded-xl px-3 py-2 bg-white"
+          onChange={(e) => {
+            setSort(e.target.value);
+            applyFilters({ sort: e.target.value });
+          }}
         >
-          <option value="newest">Спочатку нові</option>
-          <option value="oldest">Спочатку старі</option>
-          <option value="price_asc">Ціна: від дешевих</option>
-          <option value="price_desc">Ціна: від дорогих</option>
-          <option value="name_asc">Назва: А-Я</option>
-          <option value="name_desc">Назва: Я-А</option>
+          <option value="newest">Нові</option>
+          <option value="price_asc">Дешеві</option>
+          <option value="price_desc">Дорогі</option>
         </select>
 
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="px-4 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition"
-        >
-          Скинути
-        </button>
+        <button onClick={resetFilters}>Скинути</button>
       </div>
 
-      {loading && <p>Завантаження товарів...</p>}
-      {!loading && error && <p>{error}</p>}
-      {!loading && !error && products.length === 0 && <p>Товарів не знайдено.</p>}
+      <div className={styles.grid}>
+        {products.map((product) => (
+          <div key={product.id} className={styles.card}>
+            
+            <div className={styles.badges}>
+              <span className={`${styles.badge} ${styles.badgeType}`}>
+                {product.productType === "HARNESS" && "Шлейка"}
+                {product.productType === "FOOD" && "Корм"}
+                {product.productType === "TOY" && "Іграшка"}
+                {product.productType === "ACCESSORY" && "Аксесуар"}
+                {product.productType === "HYGIENE" && "Гігієна"}
+              </span>
 
-      {!loading && !error && products.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-2xl shadow-md border border-yellow-300 p-5"
-            >
-              <div className="mb-3">
-                <p className="text-xs opacity-70">{product.category.name}</p>
-                <h3 className="text-xl font-bold mt-1">{product.name}</h3>
-              </div>
+              <span className={`${styles.badge} ${styles.badgePet}`}>
+                {product.petType === "DOG" && "Собака"}
+                {product.petType === "CAT" && "Кіт"}
+              </span>
+            </div>
 
-              {product.description && (
-                <p className="text-sm opacity-80 mb-3">{product.description}</p>
+            <h3 className={styles.name}>{product.name}</h3>
+
+            {product.description && (
+              <p className={styles.desc}>{product.description}</p>
+            )}
+
+            <div className={styles.info}>
+              {product.brand && <p><b>Бренд:</b> {product.brand}</p>}
+              <p><b>Тип товару:</b> {product.productType}</p>
+              <p><b>Тип тварини:</b> {product.petType}</p>
+              <p><b>Вік:</b> {product.ageGroup}</p>
+
+              {product.sizeLabel && <p><b>Розмір:</b> {product.sizeLabel}</p>}
+              {product.neckMinCm && product.neckMaxCm && (
+                <p><b>Шия:</b> {product.neckMinCm}-{product.neckMaxCm} см</p>
+              )}
+              {product.chestMinCm && product.chestMaxCm && (
+                <p><b>Груди:</b> {product.chestMinCm}-{product.chestMaxCm} см</p>
+              )}
+              {product.recommendedWeightMinKg && product.recommendedWeightMaxKg && (
+                <p>
+                  <b>Вага:</b> {product.recommendedWeightMinKg}-
+                  {product.recommendedWeightMaxKg} кг
+                </p>
               )}
 
-              <div className="space-y-1 text-sm mb-4">
-                {product.brand && (
-                  <p>
-                    <strong>Бренд:</strong> {product.brand}
-                  </p>
-                )}
-
-                <p>
-                  <strong>Тип товару:</strong> {product.productType}
-                </p>
-
-                <p>
-                  <strong>Тип тварини:</strong> {product.petType}
-                </p>
-
-                <p>
-                  <strong>Вік:</strong> {product.ageGroup}
-                </p>
-
-                {product.foodType && (
-                  <p>
-                    <strong>Тип корму:</strong> {product.foodType}
-                  </p>
-                )}
-
-                {product.caloriesPer100g !== null && (
-                  <p>
-                    <strong>Ккал / 100 г:</strong> {product.caloriesPer100g}
-                  </p>
-                )}
-
-                {product.feedingMinGPerDay !== null &&
-                  product.feedingMaxGPerDay !== null && (
-                    <p>
-                      <strong>Добова норма:</strong> {product.feedingMinGPerDay}–
-                      {product.feedingMaxGPerDay} г
-                    </p>
-                  )}
-
-                {product.sizeLabel && (
-                  <p>
-                    <strong>Розмір:</strong> {product.sizeLabel}
-                  </p>
-                )}
-
-                {product.neckMinCm !== null && product.neckMaxCm !== null && (
-                  <p>
-                    <strong>Шия:</strong> {product.neckMinCm}–{product.neckMaxCm} см
-                  </p>
-                )}
-
-                {product.chestMinCm !== null && product.chestMaxCm !== null && (
-                  <p>
-                    <strong>Груди:</strong> {product.chestMinCm}–{product.chestMaxCm} см
-                  </p>
-                )}
-
-                {product.recommendedWeightMinKg !== null &&
-                  product.recommendedWeightMaxKg !== null && (
-                    <p>
-                      <strong>Вага тварини:</strong>{" "}
-                      {product.recommendedWeightMinKg}–
-                      {product.recommendedWeightMaxKg} кг
-                    </p>
-                  )}
-
-                <p>
-                  <strong>Наявність:</strong> {product.stock}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-orange-600">
-                  {product.price} ₴
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => handleAddToCart(product.id)}
-                  className="px-4 py-2 rounded-xl bg-yellow-300 hover:bg-yellow-400 transition"
-                >
-                  У кошик
-                </button>
-              </div>
+              <p><b>Наявність:</b> {product.stock}</p>
             </div>
-          ))}
+
+            <div className={styles.bottom}>
+              <span className={styles.price}>{product.price} ₴</span>
+              <button onClick={() => handleAddToCart(product.id)}>
+                У кошик
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ✅ КНОПКА ПАГІНАЦІЇ */}
+      {hasMore && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <button
+            onClick={() => loadProducts(page + 1)}
+            className={styles.loadMore}
+          >
+            Показати ще
+          </button>
         </div>
       )}
     </section>

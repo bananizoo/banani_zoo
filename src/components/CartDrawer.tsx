@@ -126,7 +126,7 @@ export default function CartDrawer() {
     <>
       {/* 🔔 Повідомлення */}
       {showAddedMessage && (
-        <div className="fixed right-6 bottom-24 bg-yellow-100 border border-yellow-300 px-4 py-3 rounded-xl shadow-lg z-[1002] animate-bounce">
+        <div className="fixed right-6 bottom-24 bg-white/90 backdrop-blur border border-yellow-200 px-5 py-3 rounded-2xl shadow-lg z-[1002] transition-all duration-300">
           🛒 Товар додано до кошика
         </div>
       )}
@@ -145,9 +145,17 @@ export default function CartDrawer() {
         )}
       </button>
 
+      {/* 🔲 OVERLAY */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[1000]"
+        />
+      )}
+
       {/* 📦 DRAWER */}
       <div
-        className={`fixed top-0 right-0 h-full w-[360px] bg-yellow-50 border-l-2 border-yellow-300 shadow-2xl z-[1001] transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-full w-[360px] bg-gradient-to-b from-[#fffdf7] to-[#fff3d6] border-l border-yellow-200 shadow-[0_20px_60px_rgba(0,0,0,0.15)] z-[1001] transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -174,7 +182,7 @@ export default function CartDrawer() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white rounded-2xl border border-yellow-300 p-4 shadow-sm"
+                    className="bg-white rounded-2xl border border-yellow-200 p-4 shadow-sm"
                   >
                     <p className="font-semibold">{item.productName}</p>
 
@@ -191,7 +199,7 @@ export default function CartDrawer() {
                         onClick={() =>
                           decreaseQuantity(item.productId, item.quantity)
                         }
-                        className="px-3 py-1 rounded-lg bg-yellow-200 hover:bg-yellow-300"
+                        className="px-3 py-1 rounded-lg bg-yellow-100 hover:bg-yellow-200"
                       >
                         −
                       </button>
@@ -200,7 +208,7 @@ export default function CartDrawer() {
                         onClick={() =>
                           increaseQuantity(item.productId, item.quantity)
                         }
-                        className="px-3 py-1 rounded-lg bg-yellow-200 hover:bg-yellow-300"
+                        className="px-3 py-1 rounded-lg bg-yellow-100 hover:bg-yellow-200"
                       >
                         +
                       </button>
@@ -214,7 +222,7 @@ export default function CartDrawer() {
                     </div>
 
                     {confirmProductId === item.productId && (
-                      <div className="mt-3 bg-yellow-100 p-3 rounded-lg border border-yellow-300">
+                      <div className="mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                         <p className="text-sm">
                           Видалити товар з кошика?
                         </p>
@@ -244,7 +252,7 @@ export default function CartDrawer() {
 
           {/* FOOTER */}
           {items.length > 0 && (
-            <div className="pt-4 border-t border-yellow-300">
+            <div className="pt-4 border-t border-yellow-200">
               <h3 className="text-lg font-bold mb-3">
                 Разом: {totalPrice.toFixed(2)} грн
               </h3>
