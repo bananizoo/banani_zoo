@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ProductCatalog from "@/components/ProductCatalog";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -39,7 +40,9 @@ export default function Home() {
       </section>
 
       {/* КАТАЛОГ */}
-      <ProductCatalog />
+      <Suspense fallback={<div className="text-center py-10">Завантаження каталогу...</div>}>
+        <ProductCatalog />
+      </Suspense>
 
     </div>
   );
