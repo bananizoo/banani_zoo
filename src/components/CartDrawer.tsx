@@ -32,28 +32,34 @@ export default function CartDrawer() {
   try {
     setLoading(true);
 
-    const response = await fetch("/api/cart", {
-      credentials: "include",
-    });
+const response = await fetch("/api/cart", {
+  credentials: "include",
+});
 
-    if (!response.ok) {
-      // ❗ НЕ авторизований → беремо з localStorage
-      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+let data: CartResponse | null = null;
 
-      setItems(localCart);
+try {
+  data = await response.json();
+} catch {}
 
-      const total = localCart.reduce(
-        (sum: number, item: any) => sum + item.price * item.quantity,
-        0
-      );
+if (!response.ok || !data?.cart) {
+  // ❗ НЕ авторизований або кошик пустий → беремо з localStorage
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      setTotalPrice(total);
-      return;
-    }
+  setItems(localCart);
 
-    const data: CartResponse = await response.json();
-    setItems(data.cart.items);
-    setTotalPrice(data.totalPrice);
+  const total = localCart.reduce(
+    (sum: number, item: any) => sum + item.price * item.quantity,
+    0
+  );
+
+  setTotalPrice(total);
+  return;
+}
+
+// ✅ якщо все ок
+setItems(data.cart.items);
+setTotalPrice(data.totalPrice);
 
   } catch {
     setItems([]);
@@ -347,6 +353,7 @@ async function removeItem(productId: string) {
 
       // 🔥 ОЦЕ ДОДАЙ
   await syncLocalCartToServer();
+  await loadCart();
 
     setIsOpen(false);
     window.location.href = "/checkout";
