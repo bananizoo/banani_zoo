@@ -107,16 +107,37 @@ export default function ProductCatalog() {
     router.push("/");
   }
 
-  async function handleAddToCart(productId: string) {
-    await fetch("/api/cart/add", {
-      method: "POST",
-      body: JSON.stringify({ productId }),
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+async function handleAddToCart(product: Product) {
+  const response = await fetch("/api/cart/add", {
+    method: "POST",
+    body: JSON.stringify({ productId: product.id }),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
 
-    window.dispatchEvent(new Event("cart-item-added"));
+  if (!response.ok) {
+    // ❗ НЕ авторизований → додаємо в localStorage
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const existing = cart.find((item: any) => item.productId === product.id);
+
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      cart.push({
+        id: product.id,
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        quantity: 1,
+      });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
   }
+
+  window.dispatchEvent(new Event("cart-item-added"));
+}
 
   return (
     <section className={styles.wrapper}>
@@ -215,7 +236,7 @@ export default function ProductCatalog() {
 
             <div className={styles.bottom}>
               <span className={styles.price}>{product.price} ₴</span>
-              <button onClick={() => handleAddToCart(product.id)}>
+              <button onClick={() => handleAddToCart(product)}>
                 У кошик
               </button>
             </div>

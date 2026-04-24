@@ -58,10 +58,10 @@ export default function CheckoutPage() {
         });
 
         if (!response.ok) {
-          setItems([]);
-          setTotalPrice(0);
-          return;
-        }
+  alert("Будь ласка, увійдіть в акаунт для оформлення замовлення!");
+  router.push("/login");
+  return;
+}
 
         const data: CartResponse = await response.json();
         setItems(data.cart.items);

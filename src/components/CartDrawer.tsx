@@ -26,31 +26,65 @@ export default function CartDrawer() {
 
   const [confirmProductId, setConfirmProductId] = useState<string | null>(null);
   const [showAddedMessage, setShowAddedMessage] = useState(false);
+  const [showAuthMessage, setShowAuthMessage] = useState(false);
 
-  async function loadCart() {
-    try {
-      setLoading(true);
+ async function loadCart() {
+  try {
+    setLoading(true);
 
-      const response = await fetch("/api/cart", {
-        credentials: "include",
-      });
+    const response = await fetch("/api/cart", {
+      credentials: "include",
+    });
 
-      if (!response.ok) {
-        setItems([]);
-        setTotalPrice(0);
-        return;
-      }
+    if (!response.ok) {
+      // ❗ НЕ авторизований → беремо з localStorage
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      const data: CartResponse = await response.json();
-      setItems(data.cart.items);
-      setTotalPrice(data.totalPrice);
-    } catch {
-      setItems([]);
-      setTotalPrice(0);
-    } finally {
-      setLoading(false);
+      setItems(localCart);
+
+      const total = localCart.reduce(
+        (sum: number, item: any) => sum + item.price * item.quantity,
+        0
+      );
+
+      setTotalPrice(total);
+      return;
     }
+
+    const data: CartResponse = await response.json();
+    setItems(data.cart.items);
+    setTotalPrice(data.totalPrice);
+
+  } catch {
+    setItems([]);
+    setTotalPrice(0);
+  } finally {
+    setLoading(false);
   }
+}
+
+async function syncLocalCartToServer() {
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  if (!localCart.length) return;
+
+  for (const item of localCart) {
+    await fetch("/api/cart/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        productId: item.productId,
+        quantity: item.quantity,
+      }),
+    });
+  }
+
+  // 🧹 очищаємо localStorage після переносу
+  localStorage.removeItem("cart");
+}
 
   useEffect(() => {
     loadCart();
@@ -77,48 +111,80 @@ export default function CartDrawer() {
     };
   }, []);
 
-  async function increaseQuantity(productId: string, currentQuantity: number) {
-    await fetch("/api/cart/item", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ productId, quantity: currentQuantity + 1 }),
-    });
+    function updateLocalCart(productId: string, quantity: number) {
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    await loadCart();
+  const updated = cart.map((item: any) =>
+    item.productId === productId
+      ? { ...item, quantity }
+      : item
+  );
+
+  localStorage.setItem("cart", JSON.stringify(updated));
+}
+
+function removeLocalItem(productId: string) {
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  const updated = cart.filter((item: any) => item.productId !== productId);
+
+  localStorage.setItem("cart", JSON.stringify(updated));
+}
+
+async function increaseQuantity(productId: string, currentQuantity: number) {
+  const response = await fetch("/api/cart/item", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ productId, quantity: currentQuantity + 1 }),
+  });
+
+  if (!response.ok) {
+    updateLocalCart(productId, currentQuantity + 1);
   }
 
-  function decreaseQuantity(productId: string, currentQuantity: number) {
-    if (currentQuantity === 1) {
-      setConfirmProductId(productId);
-      return;
-    }
+  await loadCart();
+}
 
-    updateQuantity(productId, currentQuantity - 1);
+function decreaseQuantity(productId: string, currentQuantity: number) {
+  if (currentQuantity === 1) {
+    setConfirmProductId(productId);
+    return;
   }
 
-  async function updateQuantity(productId: string, quantity: number) {
-    await fetch("/api/cart/item", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ productId, quantity }),
-    });
+  updateQuantity(productId, currentQuantity - 1);
+}
 
-    await loadCart();
+async function updateQuantity(productId: string, quantity: number) {
+  const response = await fetch("/api/cart/item", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ productId, quantity }),
+  });
+
+  if (!response.ok) {
+    updateLocalCart(productId, quantity);
   }
 
-  async function removeItem(productId: string) {
-    await fetch("/api/cart/item", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ productId }),
-    });
+  await loadCart();
+}
 
-    setConfirmProductId(null);
-    await loadCart();
+async function removeItem(productId: string) {
+  const response = await fetch("/api/cart/item", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ productId }),
+  });
+
+  if (!response.ok) {
+    removeLocalItem(productId);
   }
+
+  setConfirmProductId(null);
+  await loadCart();
+}
 
   const totalItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -126,17 +192,23 @@ export default function CartDrawer() {
     <>
       {/* 🔔 Повідомлення */}
       {showAddedMessage && (
-        <div className="fixed right-6 bottom-24 bg-white/90 backdrop-blur border border-yellow-200 px-5 py-3 rounded-2xl shadow-lg z-[1002] transition-all duration-300">
+        <div className="fixed right-6 bottom-35 bg-white/90 backdrop-blur border border-yellow-200 px-5 py-3 rounded-2xl shadow-lg z-[1002] transition-all duration-300">
           🛒 Товар додано до кошика
         </div>
       )}
 
+      {showAuthMessage && (
+  <div className="fixed right-6 bottom-35 bg-white/90 backdrop-blur border border-red-200 px-5 py-3 rounded-2xl shadow-lg z-[1002] duration-300">
+    🔒 Увійдіть в акаунт, щоб оформити замовлення
+  </div>
+)}
+
       {/* 🛒 КНОПКА */}
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed right-6 bottom-6 w-24 h-24 rounded-full bg-yellow-200 hover:bg-yellow-400 shadow-xl flex items-center justify-center text-2xl z-[1000] transition transform hover:scale-110"
-      >
-        🛒
+<button
+  onClick={() => setIsOpen(true)}
+  className="fixed right-6 bottom-6 w-24 h-24 rounded-full bg-yellow-200 hover:bg-yellow-400 shadow-xl flex items-center justify-center text-2xl z-[1000] transition transform hover:scale-110"
+>
+  🛒
 
         {totalItemsCount > 0 && (
           <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full shadow">
@@ -257,15 +329,32 @@ export default function CartDrawer() {
                 Разом: {totalPrice.toFixed(2)} грн
               </h3>
 
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  window.location.href = "/checkout";
-                }}
-                className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold py-3 rounded-xl shadow"
-              >
-                Оформити замовлення
-              </button>
+<button
+  onClick={async () => {
+    const response = await fetch("/api/cart", {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      setShowAuthMessage(true);
+
+      setTimeout(() => {
+        setShowAuthMessage(false);
+      }, 2500);
+
+      return;
+    }
+
+      // 🔥 ОЦЕ ДОДАЙ
+  await syncLocalCartToServer();
+
+    setIsOpen(false);
+    window.location.href = "/checkout";
+  }}
+  className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold py-3 rounded-xl shadow"
+>
+  Оформити замовлення
+</button>
             </div>
           )}
         </div>
