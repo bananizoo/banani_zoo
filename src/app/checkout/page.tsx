@@ -213,7 +213,7 @@ export default function CheckoutPage() {
 
   if (loadingCart) return <p className="mt-8 text-lg">Завантаження...</p>;
 
-  if (items.length === 0) {
+  if (items.length === 0 && !showSuccessModal) {
     return (
       <section className="mt-8">
         <h1 className="text-3xl font-bold mb-4">Оформлення замовлення</h1>
@@ -229,6 +229,51 @@ export default function CheckoutPage() {
 
   return (
     <section className="mt-10 space-y-8 text-[17px]">
+
+    {showSuccessModal && (
+  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[2000]">
+
+    <div className="bg-gradient-to-b from-[#fffdf7] to-[#fff3d6] 
+                    border border-yellow-300 
+                    rounded-3xl 
+                    p-7 
+                    w-[90%] max-w-md 
+                    text-center 
+                    shadow-[0_20px_60px_rgba(0,0,0,0.15)] 
+                    animate-fade-in">
+
+      <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-2">
+        Дякуємо за замовлення!
+      </h2>
+
+      <p className="text-gray-700 mb-2">
+        Ваше замовлення успішно оформлено
+      </p>
+
+      <p className="mb-5 text-lg">
+        Номер: <span className="font-bold text-orange-500">BANANI--{successOrderNumber}</span>
+      </p>
+
+      <button
+        onClick={() => {
+          setShowSuccessModal(false);
+          router.push("/");
+        }}
+        className="bg-yellow-400 hover:bg-yellow-500 
+                   text-yellow-900 
+                   font-semibold 
+                   px-6 py-3 
+                   rounded-2xl 
+                   shadow-md 
+                   transition 
+                   hover:scale-105"
+      >
+        На головну
+      </button>
+
+    </div>
+  </div>
+)}
 
       <h1 className="text-4xl font-bold">Оформлення замовлення</h1>
 
