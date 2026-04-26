@@ -231,7 +231,21 @@ export default function CheckoutPage() {
     <section className="mt-10 space-y-8 text-[17px]">
 
     {showSuccessModal && (
-  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[2000]">
+   <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      width: "100vw",
+      height: "100vh",
+      background: "rgba(255, 244, 200, 0.35)",
+      backdropFilter: "blur(6px)",
+      WebkitBackdropFilter: "blur(6px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2000,
+    }}
+  >
 
     <div className="bg-gradient-to-b from-[#fffdf7] to-[#fff3d6] 
                     border border-yellow-300 
