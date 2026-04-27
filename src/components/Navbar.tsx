@@ -16,6 +16,8 @@ export default function Navbar() {
   const searchParams = useSearchParams();
   const pathname = usePathname(); // 🔥 ВАЖЛИВО
 
+  const [favoritesCount, setFavoritesCount] = useState(0);
+
   useEffect(() => {
     const currentSearch = searchParams.get("search") || "";
     setSearch(currentSearch);
@@ -29,6 +31,34 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  async function loadFavoritesCount() {
+  const response = await fetch("/api/favorites", {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    setFavoritesCount(0);
+    return;
+  }
+
+  const data = await response.json();
+  setFavoritesCount(data.count || 0);
+ }
+
+ useEffect(() => {
+  loadFavoritesCount();
+
+  function handleFavoritesUpdated() {
+    loadFavoritesCount();
+  }
+
+  window.addEventListener("favorites-updated", handleFavoritesUpdated);
+
+  return () => {
+    window.removeEventListener("favorites-updated", handleFavoritesUpdated);
+  };
+}, []);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,7 +129,9 @@ export default function Navbar() {
           <Link href="/" className={getLinkClass("/")}>Головна</Link>
           <Link href="/about" className={getLinkClass("/about")}>Про нас</Link>
           <Link href="/calculator" className={getLinkClass("/calculator")}>Калькулятор</Link>
-          <Link href="/favorites" className={getLinkClass("/favorites")}>Обране</Link>
+          <Link href="/favorites" className={getLinkClass("/favorites")}>
+            Обране {favoritesCount > 0 && <span>({favoritesCount})</span>}
+          </Link>
           <Link href="/compare" className={getLinkClass("/compare")}>Порівняння</Link>
           {/* ❌ КОШИК ВИДАЛИЛИ */}
         </div>

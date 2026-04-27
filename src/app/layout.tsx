@@ -8,6 +8,8 @@ import type { Metadata } from "next";
 
 import CartDrawer from "@/components/CartDrawer";
 
+import QuickTipsWidget from "@/components/QuickTipsWidget";
+
 const nunito = Nunito({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
@@ -41,6 +43,7 @@ export default function RootLayout({
         <Footer />
 
         <CartDrawer />
+        <QuickTipsWidget />
       </body>
     </html>
   );

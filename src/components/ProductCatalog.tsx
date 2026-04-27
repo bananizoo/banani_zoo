@@ -55,6 +55,8 @@ export default function ProductCatalog() {
   const [petType, setPetType] = useState(searchParams.get("petType") || "");
   const [productType, setProductType] = useState(searchParams.get("productType") || "");
 
+  const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>([]);
+
   // 🔄 завантаження товарів
   useEffect(() => {
     loadProducts(1, true);
@@ -139,6 +141,48 @@ async function handleAddToCart(product: Product) {
   window.dispatchEvent(new Event("cart-item-added"));
 }
 
+async function loadFavorites() {
+  const response = await fetch("/api/favorites", {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    setFavoriteProductIds([]);
+    return;
+  }
+
+  const data = await response.json();
+
+  setFavoriteProductIds(
+    data.favorites.map((item: any) => item.productId)
+  );
+}
+
+useEffect(() => {
+  loadFavorites();
+}, []);
+
+async function handleToggleFavorite(productId: string) {
+  const isFavorite = favoriteProductIds.includes(productId);
+
+  const response = await fetch("/api/favorites", {
+    method: isFavorite ? "DELETE" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ productId }),
+  });
+
+  if (!response.ok) {
+    alert("Щоб додати товар в обране, потрібно увійти в акаунт");
+    return;
+  }
+
+  await loadFavorites();
+  window.dispatchEvent(new Event("favorites-updated"));
+}
+
   return (
     <section className={styles.wrapper}>
       <h2 className={styles.title}>Каталог товарів</h2>
@@ -189,6 +233,19 @@ async function handleAddToCart(product: Product) {
       <div className={styles.grid}>
         {products.map((product) => (
           <div key={product.id} className={styles.card}>
+            <button
+              type="button"
+              onClick={() => handleToggleFavorite(product.id)}
+              style={{
+                float: "right",
+                cursor: "pointer",
+                border: "none",
+                background: "transparent",
+                fontSize: "24px",
+              }}
+            >
+              {favoriteProductIds.includes(product.id) ? "❤️" : "🤍"}
+            </button>
             
             <div className={styles.badges}>
               <span className={`${styles.badge} ${styles.badgeType}`}>
