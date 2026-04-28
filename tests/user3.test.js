@@ -15,7 +15,7 @@ test.describe('User 3 tests', () => {
     await expect(items.first()).toBeVisible();
   });
 
-  test('Cart opens', async ({ page }) => {
+  test('Cart opens and shows empty message', async ({ page }) => {
     await page.goto('/');
 
     const cartButton = page.getByText(/кошик/i).first();
