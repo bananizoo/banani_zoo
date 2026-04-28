@@ -2,29 +2,26 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 3 tests', () => {
 
-  test('Contacts link exists', async ({ page }) => {
+  test('Page has main title', async ({ page }) => {
     await page.goto('/');
 
-    const contacts = page.getByRole('link', { name: /контакти/i });
-    await expect(contacts).toBeVisible();
+    await expect(page.getByText(/зоомагазин/i)).toBeVisible();
   });
 
-  test('Page contains form or contact info', async ({ page }) => {
+  test('Products are displayed', async ({ page }) => {
     await page.goto('/');
 
-    const body = await page.textContent('body');
-    expect(body.toLowerCase()).toContain('контакт');
+    const items = page.locator('text=₴');
+    await expect(items.first()).toBeVisible();
   });
 
-  test('Telegram is external link', async ({ page }) => {
+  test('Cart opens', async ({ page }) => {
     await page.goto('/');
 
-    const telegram = page.locator('a[href*="t.me"]');
+    const cartButton = page.getByText(/кошик/i).first();
+    await cartButton.click();
 
-    if (await telegram.count() > 0) {
-      const href = await telegram.first().getAttribute('href');
-      expect(href).toContain('t.me');
-    }
+    await expect(page.getByText(/кошик порожній/i)).toBeVisible();
   });
 
 });
