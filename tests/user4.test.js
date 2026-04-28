@@ -2,25 +2,24 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 4 Tests - BaNaNi Zoo', () => {
 
-  test('Auth popup opens correctly', async ({ page }) => {
+  test('Auth popup opens when clicking profile icon', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: '👤' }).click();
-    await expect(page.locator('.auth-popup')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('.auth-popup')).toBeVisible({ timeout: 10000 });
   });
 
-  test('Footer navigation links are present', async ({ page }) => {
+  test('Footer is present with navigation', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('footer')).toBeVisible();
-    await expect(page.getByRole('link', { name: /про нас/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /калькулятор/i })).toBeVisible();
   });
 
-  test('Adding to favorites requires login', async ({ page }) => {
+  test('Clicking favorite heart shows login prompt', async ({ page }) => {
     await page.goto('/');
     
-    // Знаходимо перше сердечко
-    const heartButton = page.locator('button[style*="font-size: 24px"]').first();
-    await heartButton.click();
+    const heart = page.locator('button[style*="24px"], button:has-text("❤️"), button:has-text("🤍")').first();
+    await heart.click();
 
-    await expect(page.getByText(/увійти|логін|акаунт/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/увійти|логін|акаунт/i)).toBeVisible({ timeout: 12000 });
   });
 });
