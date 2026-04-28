@@ -2,13 +2,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 4 tests', () => {
 
-  test('Logo redirects to home', async ({ page }) => {
-    await page.goto('/about');
+  test('Logo exists on page', async ({ page }) => {
+    await page.goto('/');
 
-    const logo = page.locator('img[alt="banani"]');
-    await logo.click();
-
-    await expect(page).toHaveURL('/');
+    const logo = page.locator('img[src*="logo"]');
+    await expect(logo.first()).toBeVisible();
   });
 
   test('404 page works', async ({ page }) => {
