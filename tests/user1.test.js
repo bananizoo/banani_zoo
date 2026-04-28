@@ -10,9 +10,7 @@ test.describe('User 1 tests', () => {
   test('About page opens correctly', async ({ page }) => {
     await page.goto('/');
 
-    const aboutLink = page
-      .getByRole('navigation')
-      .getByRole('link', { name: /про нас/i });
+    const aboutLink = page.getByRole('link', { name: /про нас/i }).first();
 
     await expect(aboutLink).toBeVisible();
     await aboutLink.click();
