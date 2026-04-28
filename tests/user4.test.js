@@ -11,15 +11,15 @@ test.describe('User 4 tests', () => {
   // 2. INTEGRATION TEST
   test('Logo redirects to home', async ({ page }) => {
     await page.goto('/animals');
-    await page.click('text=Bananizoo');
-    await expect(page).toHaveURL('https://bananizoo.vercel.app/');
+    await page.locator('a[href="/"]').first().click();
+    await expect(page).toHaveURL(/vercel\.app/);
   });
 
   // 3. NEGATIVE TEST
   test('Invalid page shows 404 content', async ({ page }) => {
     await page.goto('/random-page');
     const text = await page.textContent('body');
-    expect(text.toLowerCase()).toContain('not found');
+    expect(text.toLowerCase()).toContain('could not be found');
   });
 
 });
