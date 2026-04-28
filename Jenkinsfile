@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Install') {
+        stage('Install Dependencies') {
             steps {
-                bat 'npm install'
-                bat 'npx playwright install'
+                bat 'npm ci' 
+                bat 'npx playwright install --with-deps'
             }
         }
 
-        stage('Run tests') {
+        stage('Run Playwright Tests') {
             steps {
                 bat 'npx playwright test'
             }
@@ -19,7 +18,24 @@ pipeline {
 
     post {
         always {
-            echo 'Tests finished'
+            archiveArtifacts artifacts: 'playwright-report/**', 
+                           allowEmptyArchive: true,
+                           fingerprint: true
+
+            archiveArtifacts artifacts: 'test-results/junit.xml', 
+                           allowEmptyArchive: true
+
+            junit testResults: 'test-results/junit.xml', 
+                  allowEmptyResults: true,
+                  keepLongStdio: true
+
+            echo 'Тести завершено.'
+        }
+        success {
+            echo 'Всі тести пройшли успішно!'
+        }
+        failure {
+            echo 'Деякі тести впали.'
         }
     }
 }
