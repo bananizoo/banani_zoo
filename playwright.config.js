@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'https://bananizoo.vercel.app',
     headless: true
   }
 });
