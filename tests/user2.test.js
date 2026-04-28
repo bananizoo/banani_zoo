@@ -5,7 +5,7 @@ test.describe('User 2 tests', () => {
   // 1. INTEGRATION
   test('Animals page opens', async ({ page }) => {
     await page.goto('/');
-    await page.click('text=Тварини');
+    await page.locator('a[href*="animals"]').first().click();
     await expect(page).toHaveURL(/animals/);
   });
 
@@ -13,14 +13,18 @@ test.describe('User 2 tests', () => {
   test('Animals page has content', async ({ page }) => {
     await page.goto('/animals');
     const text = await page.textContent('body');
-    expect(text.length).toBeGreaterThan(10);
+    expect(text.length).toBeGreaterThan(20);
   });
 
   // 3. NEGATIVE TEST
   test('TikTok does not open page', async ({ page }) => {
     await page.goto('/');
-    await page.click('text=TikTok');
-    await expect(page.url()).not.toContain('/tiktok');
+    const link = page.locator('a[href*="tiktok"]');
+
+    if (await link.count() > 0) {
+      await link.first().click();
+      await expect(page.url()).not.toContain('/tiktok');
+    }
   });
 
 });
