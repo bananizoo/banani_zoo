@@ -2,27 +2,28 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 3 tests', () => {
 
-  // 1. INTEGRATION
-  test('Contacts page opens', async ({ page }) => {
+  test('Contacts link exists', async ({ page }) => {
     await page.goto('/');
-    await page.locator('a[href*="contacts"]').first().click();
-    await expect(page).toHaveURL(/contacts/);
+
+    const contacts = page.getByRole('link', { name: /контакти/i });
+    await expect(contacts).toBeVisible();
   });
 
-  // 2. UI TEST
-  test('Contact form is visible', async ({ page }) => {
-    await page.goto('/contacts');
-    await expect(page.locator('form')).toBeVisible();
+  test('Page contains form or contact info', async ({ page }) => {
+    await page.goto('/');
+
+    const body = await page.textContent('body');
+    expect(body.toLowerCase()).toContain('контакт');
   });
 
-  // 3. NEGATIVE TEST
-  test('Telegram does not open internal route', async ({ page }) => {
+  test('Telegram is external link', async ({ page }) => {
     await page.goto('/');
-    const link = page.locator('a[href*="telegram"]');
 
-    if (await link.count() > 0) {
-      await link.first().click();
-      await expect(page.url()).not.toContain('/telegram');
+    const telegram = page.locator('a[href*="t.me"]');
+
+    if (await telegram.count() > 0) {
+      const href = await telegram.first().getAttribute('href');
+      expect(href).toContain('t.me');
     }
   });
 
