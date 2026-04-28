@@ -2,23 +2,25 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 4 tests', () => {
 
-  test('Navigation menu exists', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('nav')).toBeVisible();
+  test('Logo redirects to home', async ({ page }) => {
+    await page.goto('/about');
+
+    const logo = page.locator('img[alt="banani"]');
+    await logo.click();
+
+    await expect(page).toHaveURL('/');
   });
 
-  test('Logo exists and is clickable', async ({ page }) => {
-    await page.goto('/');
+  test('404 page works', async ({ page }) => {
+    await page.goto('/random-page-123');
 
-    const logo = page.locator('a[href="/"]').first();
-    await expect(logo).toBeVisible();
+    await expect(page.getByText(/404/i)).toBeVisible();
   });
 
-  test('Invalid page shows 404', async ({ page }) => {
-    await page.goto('/random-page');
+  test('Footer exists', async ({ page }) => {
+    await page.goto('/');
 
-    const text = await page.textContent('body');
-    expect(text.toLowerCase()).toContain('could not be found');
+    await expect(page.locator('footer')).toBeVisible();
   });
 
 });
