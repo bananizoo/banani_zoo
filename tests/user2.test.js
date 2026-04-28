@@ -2,29 +2,25 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 2 tests', () => {
 
-  test('Animals navigation exists', async ({ page }) => {
+  test('Catalog loads on home page', async ({ page }) => {
     await page.goto('/');
 
-    const animalsLink = page.getByRole('link', { name: /тварини/i });
-    await expect(animalsLink).toBeVisible();
+    const products = page.locator('text=₴');
+    await expect(products.first()).toBeVisible();
   });
 
-  test('Animals page has content', async ({ page }) => {
+  test('Filter buttons exist', async ({ page }) => {
     await page.goto('/');
 
-    const text = await page.textContent('body');
-    expect(text.length).toBeGreaterThan(50);
+    await expect(page.getByText(/собаки/i)).toBeVisible();
+    await expect(page.getByText(/коти/i)).toBeVisible();
   });
 
-  test('TikTok is external link', async ({ page }) => {
+  test('Add to cart button works (exists)', async ({ page }) => {
     await page.goto('/');
 
-    const tiktok = page.locator('a[href*="tiktok"]');
-
-    if (await tiktok.count() > 0) {
-      const href = await tiktok.first().getAttribute('href');
-      expect(href).toContain('tiktok');
-    }
+    const button = page.getByRole('button', { name: /у кошик/i }).first();
+    await expect(button).toBeVisible();
   });
 
 });
