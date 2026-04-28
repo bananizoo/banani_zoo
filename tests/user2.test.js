@@ -9,14 +9,17 @@ test.describe('User 2 tests', () => {
     await expect(products.first()).toBeVisible();
   });
 
-  test('Filter buttons exist', async ({ page }) => {
+  test('Filter select exists', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByText(/собаки/i)).toBeVisible();
-    await expect(page.getByText(/коти/i)).toBeVisible();
+    const select = page.locator('select');
+    await expect(select).toBeVisible();
+
+    await expect(select).toContainText('Собаки');
+    await expect(select).toContainText('Коти');
   });
 
-  test('Add to cart button works (exists)', async ({ page }) => {
+  test('Add to cart button exists', async ({ page }) => {
     await page.goto('/');
 
     const button = page.getByRole('button', { name: /у кошик/i }).first();
