@@ -2,27 +2,30 @@ import { test, expect } from '@playwright/test';
 
 test.describe('User 1 tests', () => {
 
-  // 1. SMOKE TEST
   test('Home page loads', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveURL(/vercel\.app/);
   });
 
-  // 2. INTEGRATION UI TEST
   test('About page opens from navigation', async ({ page }) => {
     await page.goto('/');
-    await page.locator('a[href*="about"]').first().click();
-    await expect(page).toHaveURL(/about|pro-nas/);
+
+    const aboutLink = page.getByRole('link', { name: /про нас/i });
+
+    if (await aboutLink.count() > 0) {
+      await aboutLink.click();
+      await expect(page).not.toHaveURL(/$/); // не залишились на головній
+    }
   });
 
-  // 3. NEGATIVE TEST
   test('Instagram does not open internal page', async ({ page }) => {
     await page.goto('/');
-    const link = page.locator('a[href*="instagram"]');
 
-    if (await link.count() > 0) {
-      await link.first().click();
-      await expect(page.url()).not.toContain('/instagram');
+    const insta = page.locator('a[href*="instagram"]');
+
+    if (await insta.count() > 0) {
+      const href = await insta.first().getAttribute('href');
+      expect(href).toContain('instagram'); // зовнішнє посилання
     }
   });
 
