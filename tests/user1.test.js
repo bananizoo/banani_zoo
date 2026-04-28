@@ -4,29 +4,24 @@ test.describe('User 1 tests', () => {
 
   test('Home page loads', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveURL(/vercel\.app/);
+    await expect(page).toHaveURL(/bananizoo/);
   });
 
-  test('About page opens from navigation', async ({ page }) => {
+  test('About page opens correctly', async ({ page }) => {
     await page.goto('/');
 
-    const aboutLink = page.getByRole('link', { name: /про нас/i });
+    const aboutLink = page.getByRole('navigation').getByRole('link', { name: /про нас/i });
 
-    if (await aboutLink.count() > 0) {
-      await aboutLink.click();
-      await expect(page).not.toHaveURL(/$/); // не залишились на головній
-    }
+    await expect(aboutLink).toBeVisible();
+    await aboutLink.click();
+
+    await expect(page).toHaveURL(/about/);
   });
 
-  test('Instagram does not open internal page', async ({ page }) => {
+  test('Logo is visible', async ({ page }) => {
     await page.goto('/');
-
-    const insta = page.locator('a[href*="instagram"]');
-
-    if (await insta.count() > 0) {
-      const href = await insta.first().getAttribute('href');
-      expect(href).toContain('instagram'); // зовнішнє посилання
-    }
+    const logo = page.locator('img[alt="banani"]');
+    await expect(logo).toBeVisible();
   });
 
 });
