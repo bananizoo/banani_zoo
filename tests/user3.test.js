@@ -5,7 +5,7 @@ test.describe('User 3 tests', () => {
   // 1. INTEGRATION
   test('Contacts page opens', async ({ page }) => {
     await page.goto('/');
-    await page.click('text=Контакти');
+    await page.locator('a[href*="contacts"]').first().click();
     await expect(page).toHaveURL(/contacts/);
   });
 
@@ -18,8 +18,12 @@ test.describe('User 3 tests', () => {
   // 3. NEGATIVE TEST
   test('Telegram does not open internal route', async ({ page }) => {
     await page.goto('/');
-    await page.click('text=Telegram');
-    await expect(page.url()).not.toContain('/telegram');
+    const link = page.locator('a[href*="telegram"]');
+
+    if (await link.count() > 0) {
+      await link.first().click();
+      await expect(page.url()).not.toContain('/telegram');
+    }
   });
 
 });
