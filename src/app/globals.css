@@ -318,3 +318,9 @@ h1, h2, h3 {
   color: white;
   box-shadow: 0 0 15px #0088cc;
 }
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}

@@ -175,10 +175,10 @@ async function handleToggleFavorite(productId: string) {
             <label>
               Вид тварини
               <select
-                value={foodPetType}
-                onChange={(e) => setFoodPetType(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
-              >
+  value={foodPetType}
+  onChange={(e) => setFoodPetType(e.target.value)}
+  className={styles.formInput}
+>
                 <option value="CAT">Кіт</option>
                 <option value="DOG">Собака</option>
               </select>
@@ -190,7 +190,7 @@ async function handleToggleFavorite(productId: string) {
                 type="number"
                 value={weightKg}
                 onChange={(e) => setWeightKg(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
                 min="0.5"
                 step="0.1"
               />
@@ -201,7 +201,7 @@ async function handleToggleFavorite(productId: string) {
               <select
                 value={ageGroup}
                 onChange={(e) => setAgeGroup(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
               >
                 <option value="BABY">Малюк</option>
                 <option value="ADULT">Дорослий</option>
@@ -214,7 +214,7 @@ async function handleToggleFavorite(productId: string) {
               <select
                 value={activityLevel}
                 onChange={(e) => setActivityLevel(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
               >
                 <option value="low">Низький</option>
                 <option value="normal">Середній</option>
@@ -281,7 +281,7 @@ async function handleToggleFavorite(productId: string) {
               <select
                 value={harnessPetType}
                 onChange={(e) => setHarnessPetType(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
               >
                 <option value="CAT">Кіт</option>
                 <option value="DOG">Собака</option>
@@ -294,7 +294,7 @@ async function handleToggleFavorite(productId: string) {
                 type="number"
                 value={neckCm}
                 onChange={(e) => setNeckCm(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
                 min="1"
                 step="0.5"
               />
@@ -306,7 +306,7 @@ async function handleToggleFavorite(productId: string) {
                 type="number"
                 value={chestCm}
                 onChange={(e) => setChestCm(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
                 min="1"
                 step="0.5"
               />
@@ -318,7 +318,7 @@ async function handleToggleFavorite(productId: string) {
                 type="number"
                 value={backLengthCm}
                 onChange={(e) => setBackLengthCm(e.target.value)}
-                style={{ width: "100%", padding: "8px", border: "1px solid #ccc" }}
+                className={styles.formInput}
                 min="1"
                 step="0.5"
               />

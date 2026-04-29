@@ -202,3 +202,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+.formInput {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #f3d58a;
+  background: #fffdf7;
+  font-size: 14px;
+  margin-top: 6px;
+  transition: 0.2s;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #facc15;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
+}
