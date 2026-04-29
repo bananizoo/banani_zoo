@@ -2,22 +2,17 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 20px 16px 100px;
-
-  /* 🔥 світліший центр */
   background: linear-gradient(
     180deg,
     #fff4c7 0%,
     #fee28d 60%,
     #fee285 100%
   );
-
   border-radius: 36px;
   position: relative;
-
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(255, 204, 0, 0.25),
     0 0 60px rgba(255, 204, 0, 0.2);
-
   border: none;
 }
 
@@ -26,19 +21,16 @@
   position: absolute;
   inset: -15px;
   border-radius: 40px;
-
   background: radial-gradient(
     circle,
     rgba(255, 204, 0, 0.25) 0%,
     rgba(255, 204, 0, 0.1) 40%,
     transparent 70%
   );
-
   filter: blur(35px);
   z-index: -1;
 }
 
-/* ====================== HERO SECTION ====================== */
 .hero {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
@@ -90,13 +82,15 @@
 
 .primaryBtn,
 .secondaryBtn {
-  padding: 13px 26px;
+  padding: 14px 28px;
   border-radius: 16px;
   font-weight: 700;
   font-size: 15.5px;
   text-decoration: none;
   transition: all 0.3s ease;
   border: 2px solid #ffcc00;
+  min-width: 160px;
+  text-align: center;
 }
 
 .primaryBtn {
@@ -105,22 +99,21 @@
 }
 
 .primaryBtn:hover {
-  background: #ff8a00;
-  transform: translateY(-2px);
+  background: #ffb300;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 180, 0, 0.3);
 }
 
 .secondaryBtn {
-  background: transparent;
+  background: #fffaf0;
   color: #2c2c2c;
 }
 
 .secondaryBtn:hover {
   background: #fff7e0;
+  transform: translateY(-3px);
 }
 
-
-
-/* ====================== CTA БЛОК (оновлений - світліший) ====================== */
 .cta {
   background: linear-gradient(135deg, #fff7e0, #ffebcc);
   border: 3px solid #ffcc00;
@@ -150,48 +143,12 @@
   max-width: 520px;
 }
 
-/* Кнопки молочного кольору */
 .ctaButtons {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
 }
 
-.primaryBtn,
-.secondaryBtn {
-  padding: 14px 28px;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 15.5px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  border: 2px solid #ffcc00;
-  min-width: 160px;
-  text-align: center;
-}
-
-.primaryBtn {
-  background: #ffcc00;
-  color: #2c2c2c;
-}
-
-.primaryBtn:hover {
-  background: #ffb300;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 180, 0, 0.3);
-}
-
-.secondaryBtn {
-  background: #fffaf0;        /* молочний колір */
-  color: #2c2c2c;
-}
-
-.secondaryBtn:hover {
-  background: #fff7e0;
-  transform: translateY(-3px);
-}
-
-/* ====================== Інші блоки (залишаємо гарний вигляд) ====================== */
 .heroCard {
   background: #fffef7;
   border-radius: 28px;
@@ -244,7 +201,7 @@
   padding-left: 26px;
 }
 
-.checklist li:before {
+.checklist li::before {
   content: "🍌";
   position: absolute;
   left: 0;
@@ -322,14 +279,15 @@
   border: 1px solid #ffcc00;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: 1fr;
   }
+
   .split {
     grid-template-columns: 1fr;
   }
+
   .cta {
     flex-direction: column;
     text-align: center;

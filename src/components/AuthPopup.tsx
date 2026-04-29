@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type AuthPopupProps = {
   onClose: () => void;
@@ -12,9 +13,18 @@ type UserType = {
   email: string;
 };
 
+type OrderType = {
+  id: string;
+  orderNumber: number;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+};
+
 export default function AuthPopup({ onClose }: AuthPopupProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [user, setUser] = useState<UserType | null>(null);
+  const [orders, setOrders] = useState<OrderType[]>([]);
   const [isCheckingUser, setIsCheckingUser] = useState(true);
 
   const [loginEmail, setLoginEmail] = useState("");
@@ -27,6 +37,22 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  async function loadOrders() {
+    try {
+      const res = await fetch("/api/orders", { credentials: "include" });
+
+      if (!res.ok) {
+        setOrders([]);
+        return;
+      }
+
+      const data = await res.json();
+      setOrders(data.orders || []);
+    } catch {
+      setOrders([]);
+    }
+  }
+
   async function loadCurrentUser() {
     setIsCheckingUser(true);
 
@@ -35,13 +61,16 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
 
       if (!res.ok) {
         setUser(null);
+        setOrders([]);
         return;
       }
 
       const data = await res.json();
       setUser(data.user);
+      await loadOrders();
     } catch {
       setUser(null);
+      setOrders([]);
     } finally {
       setIsCheckingUser(false);
     }
@@ -143,6 +172,7 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
       });
 
       setUser(null);
+      setOrders([]);
       setMessage("");
       setMode("login");
     } catch {
@@ -167,6 +197,22 @@ export default function AuthPopup({ onClose }: AuthPopupProps) {
           <div className="avatar-big">🐵</div>
           <h3>{user.name}</h3>
           <p>{user.email}</p>
+
+          <div>
+            <h4>Мої замовлення</h4>
+
+            {orders.length > 0 ? (
+              <div>
+                {orders.slice(0, 5).map((order) => (
+                  <p key={order.id}>
+                    BANANI--{order.orderNumber} — {order.totalPrice.toFixed(2)} грн
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p>Замовлень ще немає</p>
+            )}
+          </div>
 
           <button onClick={handleLogout}>
             {loading ? "..." : "Вийти"}

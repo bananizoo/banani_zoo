@@ -22,7 +22,6 @@ const token = cookieStore.get("banani_session")?.value;
       return Response.json({ error: "Invalid session" }, { status: 401 });
     }
 
-    // знайти або створити кошик
     let cart = await prisma.cart.findUnique({
       where: { userId: session.userId },
     });
@@ -33,7 +32,6 @@ const token = cookieStore.get("banani_session")?.value;
       });
     }
 
-    // додати всі товари
     for (const item of items) {
       const existing = await prisma.cartItem.findUnique({
         where: {

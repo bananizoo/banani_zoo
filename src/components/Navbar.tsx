@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import "./navbar.css";
@@ -11,12 +11,13 @@ export default function Navbar() {
   const [search, setSearch] = useState("");
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(0);
+
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname(); // 🔥 ВАЖЛИВО
-
-  const [favoritesCount, setFavoritesCount] = useState(0);
+  const pathname = usePathname();
 
   useEffect(() => {
     const currentSearch = searchParams.get("search") || "";
@@ -33,32 +34,32 @@ export default function Navbar() {
   }, []);
 
   async function loadFavoritesCount() {
-  const response = await fetch("/api/favorites", {
-    credentials: "include",
-  });
+    const response = await fetch("/api/favorites", {
+      credentials: "include",
+    });
 
-  if (!response.ok) {
-    setFavoritesCount(0);
-    return;
+    if (!response.ok) {
+      setFavoritesCount(0);
+      return;
+    }
+
+    const data = await response.json();
+    setFavoritesCount(data.count || 0);
   }
 
-  const data = await response.json();
-  setFavoritesCount(data.count || 0);
- }
-
- useEffect(() => {
-  loadFavoritesCount();
-
-  function handleFavoritesUpdated() {
+  useEffect(() => {
     loadFavoritesCount();
-  }
 
-  window.addEventListener("favorites-updated", handleFavoritesUpdated);
+    function handleFavoritesUpdated() {
+      loadFavoritesCount();
+    }
 
-  return () => {
-    window.removeEventListener("favorites-updated", handleFavoritesUpdated);
-  };
-}, []);
+    window.addEventListener("favorites-updated", handleFavoritesUpdated);
+
+    return () => {
+      window.removeEventListener("favorites-updated", handleFavoritesUpdated);
+    };
+  }, []);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,9 +74,15 @@ export default function Navbar() {
     router.push(`/?search=${encodeURIComponent(trimmedSearch)}`);
   }
 
-  // 🔥 функція для активного лінка
   function getLinkClass(path: string) {
     return pathname === path ? "active-link" : "";
+  }
+
+  function scrollMenu(direction: "left" | "right") {
+    menuRef.current?.scrollBy({
+      left: direction === "left" ? -180 : 180,
+      behavior: "smooth",
+    });
   }
 
   return (
@@ -118,6 +125,7 @@ export default function Navbar() {
           <button
             className="profile-btn"
             onClick={() => setShowAuthPopup((prev) => !prev)}
+            type="button"
           >
             👤
           </button>
@@ -125,16 +133,45 @@ export default function Navbar() {
       </div>
 
       <div className="menu-row">
-        <div className="links">
-          <Link href="/" className={getLinkClass("/")}>Головна</Link>
-          <Link href="/about" className={getLinkClass("/about")}>Про нас</Link>
-          <Link href="/calculator" className={getLinkClass("/calculator")}>Калькулятор</Link>
+        <button
+          className="menu-scroll-btn menu-scroll-btn-left"
+          onClick={() => scrollMenu("left")}
+          type="button"
+          aria-label="Прокрутити меню вліво"
+        >
+          ‹
+        </button>
+
+        <div className="links" ref={menuRef}>
+          <Link href="/" className={getLinkClass("/")}>
+            Головна
+          </Link>
+
+          <Link href="/about" className={getLinkClass("/about")}>
+            Про нас
+          </Link>
+
+          <Link href="/calculator" className={getLinkClass("/calculator")}>
+            Калькулятор
+          </Link>
+
           <Link href="/favorites" className={getLinkClass("/favorites")}>
             Обране {favoritesCount > 0 && <span>({favoritesCount})</span>}
           </Link>
-          <Link href="/compare" className={getLinkClass("/compare")}>Порівняння</Link>
-          {/* ❌ КОШИК ВИДАЛИЛИ */}
+
+          <Link href="/compare" className={getLinkClass("/compare")}>
+            Порівняння
+          </Link>
         </div>
+
+        <button
+          className="menu-scroll-btn menu-scroll-btn-right"
+          onClick={() => scrollMenu("right")}
+          type="button"
+          aria-label="Прокрутити меню вправо"
+        >
+          ›
+        </button>
       </div>
 
       {showAuthPopup && <AuthPopup onClose={() => setShowAuthPopup(false)} />}

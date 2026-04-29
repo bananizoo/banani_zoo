@@ -19,6 +19,17 @@ type CartResponse = {
   totalPrice: number;
 };
 
+type DeliveryType = "COURIER" | "NOVA_POSHTA" | "PICKUP";
+type PaymentType = "CASH" | "CARD_ON_DELIVERY" | "ONLINE";
+
+type FormErrors = {
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  city?: string;
+  address?: string;
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
 
@@ -34,20 +45,17 @@ export default function CheckoutPage() {
   const [comment, setComment] = useState("");
 
   const [isPickup, setIsPickup] = useState(false);
-  const [deliveryType, setDeliveryType] = useState<
-    "COURIER" | "NOVA_POSHTA" | "PICKUP"
-  >("COURIER");
-
-  const [paymentType, setPaymentType] = useState<
-    "CASH" | "CARD_ON_DELIVERY" | "ONLINE"
-  >("CASH");
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>("COURIER");
+  const [paymentType, setPaymentType] = useState<PaymentType>("CASH");
 
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
 
-  const [errors, setErrors] = useState<any>({});
-
-  const [successOrderNumber, setSuccessOrderNumber] = useState<number | null>(null);
+  const [successOrderNumber, setSuccessOrderNumber] = useState<number | null>(
+    null
+  );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
@@ -58,10 +66,10 @@ export default function CheckoutPage() {
         });
 
         if (!response.ok) {
-  alert("Будь ласка, увійдіть в акаунт для оформлення замовлення!");
-  router.push("/login");
-  return;
-}
+          alert("Будь ласка, увійдіть в акаунт для оформлення замовлення!");
+          router.push("/login");
+          return;
+        }
 
         const data: CartResponse = await response.json();
         setItems(data.cart.items);
@@ -72,48 +80,59 @@ export default function CheckoutPage() {
     }
 
     loadCart();
-  }, []);
+  }, [router]);
 
-  // ======================
-  // ✅ ВАЛІДАЦІЯ (LIVE)
-  // ======================
-
-  function validateField(name: string, value: string) {
-    let error = "";
-
-    if (name === "customerName") {
-      if (value.trim().length < 2) error = "Мінімум 2 символи";
+  function getFieldError(name: keyof FormErrors, value: string) {
+    if (name === "customerName" && value.trim().length < 2) {
+      return "Мінімум 2 символи";
     }
 
-    if (name === "customerPhone") {
-      if (!/^\+380\d{9}$/.test(value)) {
-        error = "Формат: +380XXXXXXXXX";
-      }
+    if (name === "customerPhone" && !/^\+380\d{9}$/.test(value)) {
+      return "Формат: +380XXXXXXXXX";
     }
 
-    if (name === "customerEmail") {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        error = "Невірний email";
-      }
+    if (
+      name === "customerEmail" &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    ) {
+      return "Невірний email";
     }
 
-    if (name === "city" && !isPickup) {
-      if (!value.trim()) error = "Вкажіть місто";
+    if (name === "city" && !isPickup && !value.trim()) {
+      return "Вкажіть місто";
     }
 
-    if (name === "address" && !isPickup) {
-      if (!value.trim()) error = "Вкажіть адресу";
+    if (name === "address" && !isPickup && !value.trim()) {
+      return "Вкажіть адресу";
     }
 
-    setErrors((prev: any) => ({
+    return "";
+  }
+
+  function validateField(name: keyof FormErrors, value: string) {
+    const error = getFieldError(name, value);
+
+    setErrors((prev) => ({
       ...prev,
       [name]: error,
     }));
+
+    return error;
   }
 
-  // ======================
-  // 📱 МАСКА ТЕЛЕФОНУ
-  // ======================
+  function validateForm() {
+    const nextErrors: FormErrors = {
+      customerName: getFieldError("customerName", customerName),
+      customerPhone: getFieldError("customerPhone", customerPhone),
+      customerEmail: getFieldError("customerEmail", customerEmail),
+      city: getFieldError("city", city),
+      address: getFieldError("address", address),
+    };
+
+    setErrors(nextErrors);
+
+    return !Object.values(nextErrors).some(Boolean);
+  }
 
   function handlePhoneChange(value: string) {
     let cleaned = value.replace(/\D/g, "");
@@ -122,33 +141,25 @@ export default function CheckoutPage() {
       cleaned = "380" + cleaned.replace(/^380/, "");
     }
 
-    cleaned = cleaned.slice(0, 12); // 380XXXXXXXXX
+    cleaned = cleaned.slice(0, 12);
 
-    setCustomerPhone("+" + cleaned);
-    validateField("customerPhone", "+" + cleaned);
+    const formattedPhone = `+${cleaned}`;
+    setCustomerPhone(formattedPhone);
+    validateField("customerPhone", formattedPhone);
   }
 
-  // ======================
-  // 🚚 АВТОКОМПЛІТ (заготовка)
-  // ======================
+  function fetchCities(query: string) {
+    if (query.length < 2) {
+      setCitySuggestions([]);
+      return;
+    }
 
-  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
-
-  async function fetchCities(query: string) {
-    if (query.length < 2) return;
-
-    // 🔧 тут можна підключити API Нової Пошти
-    // поки просто мок
-    setCitySuggestions([
-      "Київ",
-      "Львів",
-      "Одеса",
-      "Дніпро",
-      "Харків",
-    ].filter(c => c.toLowerCase().includes(query.toLowerCase())));
+    setCitySuggestions(
+      ["Київ", "Львів", "Одеса", "Дніпро", "Харків"].filter((currentCity) =>
+        currentCity.toLowerCase().includes(query.toLowerCase())
+      )
+    );
   }
-
-  // ======================
 
   function handlePickupChange(checked: boolean) {
     setIsPickup(checked);
@@ -157,19 +168,21 @@ export default function CheckoutPage() {
       setDeliveryType("PICKUP");
       setCity("");
       setAddress("");
+      setCitySuggestions([]);
+      setErrors((prev) => ({
+        ...prev,
+        city: "",
+        address: "",
+      }));
     } else {
       setDeliveryType("COURIER");
     }
   }
 
-  function hasErrors() {
-    return Object.values(errors).some((e) => e);
-  }
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (hasErrors()) {
+    if (!validateForm()) {
       setMessage("Виправте помилки");
       return;
     }
@@ -178,7 +191,7 @@ export default function CheckoutPage() {
       setSubmitting(true);
       setMessage("");
 
-      const res = await fetch("/api/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -194,9 +207,9 @@ export default function CheckoutPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         setMessage(data?.error || "Помилка");
         return;
       }
@@ -211,7 +224,9 @@ export default function CheckoutPage() {
     }
   }
 
-  if (loadingCart) return <p className="mt-8 text-lg">Завантаження...</p>;
+  if (loadingCart) {
+    return <p className="mt-8 text-lg">Завантаження...</p>;
+  }
 
   if (items.length === 0 && !showSuccessModal) {
     return (
@@ -229,121 +244,107 @@ export default function CheckoutPage() {
 
   return (
     <section className="mt-10 space-y-8 text-[17px]">
+      {showSuccessModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(255, 244, 200, 0.35)",
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000,
+          }}
+        >
+          <div className="bg-gradient-to-b from-[#fffdf7] to-[#fff3d6] border border-yellow-300 rounded-3xl p-7 w-[90%] max-w-md text-center shadow-[0_20px_60px_rgba(0,0,0,0.15)] animate-fade-in">
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-2">
+              Дякуємо за замовлення!
+            </h2>
 
-    {showSuccessModal && (
-   <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      width: "100vw",
-      height: "100vh",
-      background: "rgba(255, 244, 200, 0.35)",
-      backdropFilter: "blur(6px)",
-      WebkitBackdropFilter: "blur(6px)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 2000,
-    }}
-  >
+            <p className="text-gray-700 mb-2">
+              Ваше замовлення успішно оформлено
+            </p>
 
-    <div className="bg-gradient-to-b from-[#fffdf7] to-[#fff3d6] 
-                    border border-yellow-300 
-                    rounded-3xl 
-                    p-7 
-                    w-[90%] max-w-md 
-                    text-center 
-                    shadow-[0_20px_60px_rgba(0,0,0,0.15)] 
-                    animate-fade-in">
+            <p className="mb-5 text-lg">
+              Номер:{" "}
+              <span className="font-bold text-orange-500">
+                BANANI--{successOrderNumber}
+              </span>
+            </p>
 
-      <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-2">
-        Дякуємо за замовлення!
-      </h2>
-
-      <p className="text-gray-700 mb-2">
-        Ваше замовлення успішно оформлено
-      </p>
-
-      <p className="mb-5 text-lg">
-        Номер: <span className="font-bold text-orange-500">BANANI--{successOrderNumber}</span>
-      </p>
-
-      <button
-        onClick={() => {
-          setShowSuccessModal(false);
-          router.push("/");
-        }}
-        className="bg-yellow-400 hover:bg-yellow-500 
-                   text-yellow-900 
-                   font-semibold 
-                   px-6 py-3 
-                   rounded-2xl 
-                   shadow-md 
-                   transition 
-                   hover:scale-105"
-      >
-        На головну
-      </button>
-
-    </div>
-  </div>
-)}
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                router.push("/");
+              }}
+              className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold px-6 py-3 rounded-2xl shadow-md transition hover:scale-105"
+            >
+              На головну
+            </button>
+          </div>
+        </div>
+      )}
 
       <h1 className="text-4xl font-bold">Оформлення замовлення</h1>
 
       <div className="grid lg:grid-cols-2 gap-8">
-
-        {/* FORM */}
         <form
           onSubmit={handleSubmit}
           className="bg-white/90 rounded-3xl p-6 border-2 border-yellow-300 shadow-xl space-y-4"
         >
           <h2 className="text-xl font-semibold">Ваші дані</h2>
 
-          {/* NAME */}
           <div>
             <input
               placeholder="Ім’я"
               value={customerName}
-              onChange={(e) => {
-                setCustomerName(e.target.value);
-                validateField("customerName", e.target.value);
+              onChange={(event) => {
+                setCustomerName(event.target.value);
+                validateField("customerName", event.target.value);
               }}
               className={inputClass}
             />
-            {errors.customerName && <p className={errorText}>{errors.customerName}</p>}
+            {errors.customerName && (
+              <p className={errorText}>{errors.customerName}</p>
+            )}
           </div>
 
-          {/* PHONE */}
           <div>
             <input
               placeholder="+380XXXXXXXXX"
               value={customerPhone}
-              onChange={(e) => handlePhoneChange(e.target.value)}
+              onChange={(event) => handlePhoneChange(event.target.value)}
               className={inputClass}
             />
-            {errors.customerPhone && <p className={errorText}>{errors.customerPhone}</p>}
+            {errors.customerPhone && (
+              <p className={errorText}>{errors.customerPhone}</p>
+            )}
           </div>
 
-          {/* EMAIL */}
           <div>
             <input
               placeholder="Email"
               value={customerEmail}
-              onChange={(e) => {
-                setCustomerEmail(e.target.value);
-                validateField("customerEmail", e.target.value);
+              onChange={(event) => {
+                setCustomerEmail(event.target.value);
+                validateField("customerEmail", event.target.value);
               }}
               className={inputClass}
             />
-            {errors.customerEmail && <p className={errorText}>{errors.customerEmail}</p>}
+            {errors.customerEmail && (
+              <p className={errorText}>{errors.customerEmail}</p>
+            )}
           </div>
 
           <label className="flex gap-2">
             <input
               type="checkbox"
               checked={isPickup}
-              onChange={(e) => handlePickupChange(e.target.checked)}
+              onChange={(event) => handlePickupChange(event.target.checked)}
             />
             Самовивіз
           </label>
@@ -353,37 +354,39 @@ export default function CheckoutPage() {
               <select
                 className={inputClass}
                 value={deliveryType}
-                onChange={(e) => setDeliveryType(e.target.value as any)}
+                onChange={(event) =>
+                  setDeliveryType(event.target.value as DeliveryType)
+                }
               >
                 <option value="COURIER">Кур’єр</option>
                 <option value="NOVA_POSHTA">Нова пошта</option>
               </select>
 
-              {/* CITY */}
               <div>
                 <input
                   placeholder="Місто"
                   value={city}
-                  onChange={(e) => {
-                    setCity(e.target.value);
-                    validateField("city", e.target.value);
-                    fetchCities(e.target.value);
+                  onChange={(event) => {
+                    setCity(event.target.value);
+                    validateField("city", event.target.value);
+                    fetchCities(event.target.value);
                   }}
                   className={inputClass}
                 />
 
                 {citySuggestions.length > 0 && (
                   <div className="bg-white border rounded-xl mt-1 shadow">
-                    {citySuggestions.map((c) => (
+                    {citySuggestions.map((currentCity) => (
                       <div
-                        key={c}
+                        key={currentCity}
                         className="px-3 py-2 hover:bg-yellow-100 cursor-pointer"
                         onClick={() => {
-                          setCity(c);
+                          setCity(currentCity);
                           setCitySuggestions([]);
+                          validateField("city", currentCity);
                         }}
                       >
-                        {c}
+                        {currentCity}
                       </div>
                     ))}
                   </div>
@@ -392,18 +395,19 @@ export default function CheckoutPage() {
                 {errors.city && <p className={errorText}>{errors.city}</p>}
               </div>
 
-              {/* ADDRESS */}
               <div>
                 <input
                   placeholder="Адреса"
                   value={address}
-                  onChange={(e) => {
-                    setAddress(e.target.value);
-                    validateField("address", e.target.value);
+                  onChange={(event) => {
+                    setAddress(event.target.value);
+                    validateField("address", event.target.value);
                   }}
                   className={inputClass}
                 />
-                {errors.address && <p className={errorText}>{errors.address}</p>}
+                {errors.address && (
+                  <p className={errorText}>{errors.address}</p>
+                )}
               </div>
             </>
           )}
@@ -411,7 +415,9 @@ export default function CheckoutPage() {
           <select
             className={inputClass}
             value={paymentType}
-            onChange={(e) => setPaymentType(e.target.value as any)}
+            onChange={(event) =>
+              setPaymentType(event.target.value as PaymentType)
+            }
           >
             <option value="CASH">Готівкою</option>
             <option value="CARD_ON_DELIVERY">Карткою</option>
@@ -421,8 +427,8 @@ export default function CheckoutPage() {
           <textarea
             placeholder="Коментар"
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className={inputClass + " h-24"}
+            onChange={(event) => setComment(event.target.value)}
+            className={`${inputClass} h-24`}
           />
 
           {message && <p className="text-red-500">{message}</p>}
@@ -436,7 +442,6 @@ export default function CheckoutPage() {
           </button>
         </form>
 
-        {/* SUMMARY */}
         <div className="bg-white/90 rounded-3xl p-6 border-2 border-yellow-300 shadow-xl">
           <h2 className="text-xl font-semibold mb-4">Ваше замовлення</h2>
 

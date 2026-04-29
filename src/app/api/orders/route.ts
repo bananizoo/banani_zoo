@@ -2,6 +2,42 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+export async function GET() {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Неавторизований користувач" },
+        { status: 401 }
+      );
+    }
+
+    const orders = await prisma.order.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        totalPrice: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ orders });
+  } catch {
+    return NextResponse.json(
+      { error: "Помилка при отриманні замовлень" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();

@@ -30,7 +30,6 @@ h1, h2, h3 {
   font-weight: 700;
 }
 
-/* 📊 РЯДОК СТАТИСТИКИ */
 .stat-row {
   display: flex;
   align-items: center;
@@ -38,7 +37,6 @@ h1, h2, h3 {
   font-size: 15px;
 }
 
-/* 🔥 БЕЙДЖ */
 .stat-highlight {
   font-weight: 800;
   font-size: 1.3rem;
@@ -57,7 +55,6 @@ h1, h2, h3 {
   text-align: center;
 }
 
-/* Красиві картки */
 .card {
   background: white;
   border-radius: 24px;
@@ -81,7 +78,6 @@ h1, h2, h3 {
   z-index: 99999 !important;
 }
 
-/* ❌ Кнопка закриття */
 .auth-close {
   position: absolute;
   top: 10px;
@@ -104,7 +100,7 @@ h1, h2, h3 {
   flex: 1;
   padding: 8px 0;
   border: none;
-  border-radius: 999px; /* 🔥 робить овальними */
+  border-radius: 999px; 
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -121,7 +117,6 @@ h1, h2, h3 {
   background: rgba(255, 204, 0, 0.2);
 }
 
-/* 📝 Форма */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -157,7 +152,6 @@ h1, h2, h3 {
   animation: fade-in 0.25s ease-out;
 }
 
-/* 👤 Профіль */
 .profile-view {
   display: flex;
   flex-direction: column;
@@ -168,13 +162,11 @@ h1, h2, h3 {
   font-size: 40px;
 }
 
-/* ⚠️ Повідомлення */
 .auth-message {
   margin-top: 10px;
   color: red;
 }
 
-/* 🔐 overlay */
 .auth-overlay {
   position: fixed;
   top: 0;
@@ -188,7 +180,6 @@ h1, h2, h3 {
   z-index: 1000;
 }
 
-/* 📦 popup */
 .auth-popup {
   background: white;
   padding: 30px;
@@ -199,7 +190,6 @@ h1, h2, h3 {
   box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
-/* ❌ close */
 .auth-close {
   position: absolute;
   top: 10px;
@@ -210,7 +200,6 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-/* 🔄 tabs */
 .auth-tabs {
   display: flex;
   margin-bottom: 15px;
@@ -229,7 +218,6 @@ h1, h2, h3 {
   font-weight: bold;
 }
 
-/* 📝 form */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -250,7 +238,6 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-/* 👤 profile */
 .profile-view {
   display: flex;
   flex-direction: column;
@@ -261,7 +248,6 @@ h1, h2, h3 {
   font-size: 40px;
 }
 
-/* ⚠️ message */
 .auth-message {
   margin-top: 10px;
   color: red;
@@ -271,7 +257,6 @@ h1, h2, h3 {
   position: relative;
 }
 
-/* ✨ glow для навігації */
 .footer-links a {
   transition: all 0.3s ease;
 }
@@ -281,7 +266,6 @@ h1, h2, h3 {
   text-shadow: 0 0 8px rgba(255,255,255,0.9);
 }
 
-/* 🔘 соц іконки */
 .social-icon {
   display: flex;
   align-items: center;
@@ -298,21 +282,18 @@ h1, h2, h3 {
   transition: all 0.3s ease;
 }
 
-/* Instagram */
 .social-icon:nth-child(1):hover {
   background: #e1306c;
   color: white;
   box-shadow: 0 0 15px #e1306c;
 }
 
-/* TikTok */
 .social-icon:nth-child(2):hover {
   background: #000;
   color: #00f2ea;
   box-shadow: 0 0 15px #00f2ea;
 }
 
-/* Telegram */
 .social-icon:nth-child(3):hover {
   background: #0088cc;
   color: white;

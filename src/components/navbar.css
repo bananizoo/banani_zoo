@@ -4,15 +4,13 @@
   z-index: 1000;
   transition: all 0.4s ease;
   border-bottom: 4px solid #ffcc00;
-  overflow: visible; 
+  overflow: visible;
 }
 
-/* ====================== СТАТИЧНИЙ СТАН (на початку сторінки) ====================== */
 .navbar.navbar-scrolled {
   background: rgba(253, 235, 203, 0.849);
 }
 
-/* ====================== СКРОЛЕНИЙ СТАН ====================== */
 .navbar:not(.navbar-scrolled) {
   background: #fee085c9;
   backdrop-filter: blur(20px);
@@ -20,10 +18,9 @@
 }
 
 .navbar.navbar-scrolled .top-row {
-  background: transparent;   /* прибираємо додатковий фон при скролі */
+  background: transparent;
 }
 
-/* 🔥 АКТИВНА СТОРІНКА */
 .links a.active-link {
   color: #ff8a00;
   position: relative;
@@ -32,7 +29,7 @@
 .links a.active-link::after {
   content: "";
   position: absolute;
-  bottom: -6px;
+  bottom: -4px;
   left: 0;
   width: 100%;
   height: 3px;
@@ -40,12 +37,10 @@
   border-radius: 2px;
 }
 
-/* плавний ефект */
 .links a {
   position: relative;
 }
 
-/* ====================== TOP ROW ====================== */
 .top-row {
   display: flex;
   align-items: center;
@@ -56,7 +51,6 @@
   transition: background 0.4s ease;
 }
 
-/* Анімація мавпочки */
 .monkey-logo {
   transition: transform 0.6s ease;
   animation: monkeySwing 3s ease-in-out infinite;
@@ -68,11 +62,15 @@
 }
 
 @keyframes monkeySwing {
-  0%, 100% { transform: rotate(-8deg); }
-  70% { transform: rotate(8deg); }
+  0%, 100% {
+    transform: rotate(-8deg);
+  }
+
+  70% {
+    transform: rotate(8deg);
+  }
 }
 
-/* BANANI Logo */
 .banani-logo {
   transition: transform 0.4s ease;
 }
@@ -81,7 +79,6 @@
   transform: scale(1.05);
 }
 
-/* Пошук та профіль */
 .right-block {
   display: flex;
   align-items: center;
@@ -125,47 +122,87 @@
   transform: scale(1.1);
 }
 
-/* Меню */
 .menu-row {
   background: rgba(255, 250, 240, 0.95);
   padding: 12px 40px;
   border-top: 1px solid #f4d559;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  overflow: hidden;
 }
 
 .links {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 38px;
   max-width: 1400px;
-  margin: 0 auto;
+  height: 34px;
+  margin: 0;
+  padding: 0 2px;
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.5px;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.links::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .links a {
   color: #2c2c2c;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 34px;
 }
 
 .links a:hover {
   color: #ff8a00;
-  transform: translateY(-2px);
+}
+
+.menu-scroll-btn {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #ffcc00;
+  color: #2c2c2c;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255, 179, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.menu-scroll-btn:hover {
+  background: #ff8a00;
+  color: white;
+  transform: scale(1.08);
 }
 
 .auth-popup button {
   cursor: pointer;
 }
 
-/* ====================== MOBILE ADAPTIVE ====================== */
 @media (max-width: 768px) {
   .top-row {
     padding: 12px 14px;
     gap: 10px;
   }
 
-  /* на телефоні залишаємо тільки мавпочку */
   .logo-center {
     display: none;
   }
@@ -203,21 +240,25 @@
   }
 
   .menu-row {
-    padding: 10px 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .menu-scroll-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .links {
     justify-content: flex-start;
     gap: 26px;
-    width: max-content;
-    min-width: 100%;
+    width: 100%;
+    min-width: 0;
+    height: 34px;
     font-size: 1rem;
+    overflow: hidden;
     white-space: nowrap;
-  }
-
-  .links a {
-    flex-shrink: 0;
+    padding: 0 4px;
   }
 }
