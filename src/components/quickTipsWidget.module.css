@@ -3,12 +3,11 @@
   left: 24px;
   bottom: 24px;
 
-  width: 74px;
-  height: 74px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
 
-  background: #ffeb7a; /* як bg-yellow-200 */
-  box-shadow: 0 20px 40px rgba(250, 204, 21, 0.4);
+  background: #fce877; /* як bg-yellow-200 */
   border: none;
 
   display: flex;
@@ -19,7 +18,7 @@
   cursor: pointer;
   z-index: 1000;
 
-  box-shadow: 0 12px 30px rgba(255, 193, 7, 0.35);
+  box-shadow: 0 12px 30px rgba(98, 74, 4, 0.255);
   transition: 0.25s ease;
 }
 
