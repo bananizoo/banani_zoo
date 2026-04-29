@@ -8,8 +8,8 @@ function getActivityMultiplier(activity: string) {
 }
 
 function getAgeMultiplier(age: string) {
-  if (age === "baby") return 1.4;
-  if (age === "senior") return 0.85;
+  if (age === "BABY") return 1.4;
+  if (age === "SENIOR") return 0.85;
   return 1;
 }
 
@@ -42,13 +42,8 @@ export async function POST(request: NextRequest) {
           isActive: true,
           stock: { gt: 0 },
           productType: "FOOD",
-          petType: {
-            in: [petType, "UNIVERSAL"],
-          },
-          OR: [
-            { ageGroup },
-            { ageGroup: "UNIVERSAL" },
-          ],
+          petType,
+          OR: [{ ageGroup }, { ageGroup: "UNIVERSAL" }],
         },
         include: {
           category: true,
@@ -79,14 +74,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const products = await prisma.product.findMany({
+      let products = await prisma.product.findMany({
         where: {
           isActive: true,
           stock: { gt: 0 },
           productType: "HARNESS",
-          petType: {
-            in: [petType, "UNIVERSAL"],
-          },
+          petType,
           neckMinCm: { lte: neck },
           neckMaxCm: { gte: neck },
           chestMinCm: { lte: chest },
@@ -101,6 +94,25 @@ export async function POST(request: NextRequest) {
         ],
         take: 3,
       });
+
+      if (products.length === 0) {
+        products = await prisma.product.findMany({
+          where: {
+            isActive: true,
+            stock: { gt: 0 },
+            productType: "HARNESS",
+            petType,
+          },
+          include: {
+            category: true,
+          },
+          orderBy: [
+            { searchBoost: "desc" },
+            { price: "asc" },
+          ],
+          take: 3,
+        });
+      }
 
       return NextResponse.json({
         neckCm: neck,

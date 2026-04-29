@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./productCatalog.module.css";
+import { Heart } from "lucide-react";
 
 type Category = {
   id: string;
@@ -233,19 +234,18 @@ async function handleToggleFavorite(productId: string) {
       <div className={styles.grid}>
         {products.map((product) => (
           <div key={product.id} className={styles.card}>
-            <button
-              type="button"
-              onClick={() => handleToggleFavorite(product.id)}
-              style={{
-                float: "right",
-                cursor: "pointer",
-                border: "none",
-                background: "transparent",
-                fontSize: "24px",
-              }}
-            >
-              {favoriteProductIds.includes(product.id) ? "❤️" : "🤍"}
-            </button>
+<button
+  type="button"
+  onClick={() => handleToggleFavorite(product.id)}
+  className={styles.favoriteBtn}
+>
+<Heart
+  size={28}
+  strokeWidth={2}
+  color="#e28f00"
+  fill={favoriteProductIds.includes(product.id) ? "#e39000" : "none"}
+/>
+</button>
             
             <div className={styles.badges}>
               <span className={`${styles.badge} ${styles.badgeType}`}>

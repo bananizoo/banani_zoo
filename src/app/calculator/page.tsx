@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import styles from "./calculator.module.css";
+import { Heart } from "lucide-react";
 
 type Product = {
   id: string;
@@ -39,6 +41,46 @@ export default function CalculatorPage() {
   } | null>(null);
 
   const [message, setMessage] = useState("");
+
+  const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>([]);
+
+async function loadFavorites() {
+  const response = await fetch("/api/favorites", {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    setFavoriteProductIds([]);
+    return;
+  }
+
+  const data = await response.json();
+
+  setFavoriteProductIds(
+    data.favorites.map((item: any) => item.productId)
+  );
+}
+
+async function handleToggleFavorite(productId: string) {
+  const isFavorite = favoriteProductIds.includes(productId);
+
+  const response = await fetch("/api/favorites", {
+    method: isFavorite ? "DELETE" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ productId }),
+  });
+
+  if (!response.ok) {
+    alert("Щоб додати товар в обране, потрібно увійти в акаунт");
+    return;
+  }
+
+  await loadFavorites();
+  window.dispatchEvent(new Event("favorites-updated"));
+}
 
   async function addToCart(productId: string) {
     const response = await fetch("/api/cart/add", {
@@ -116,26 +158,20 @@ export default function CalculatorPage() {
   }
 
   return (
-    <section style={{ marginTop: "24px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "20px" }}>
-        Калькулятори для тварин
-      </h1>
+    <section className={styles.wrapper}>
+      <h1 className={styles.title}>
+  Калькулятори для тварин
+</h1>
 
-      {message && <p>{message}</p>}
+      {message && <p className={styles.message}>{message}</p>}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "24px",
-        }}
-      >
-        <div style={{ background: "white", border: "1px solid #ddd", padding: "20px" }}>
+      <div className={styles.grid}>
+        <div className={styles.card}>
           <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>
             Калькулятор корму
           </h2>
 
-          <form onSubmit={calculateFood} style={{ display: "grid", gap: "12px" }}>
+          <form onSubmit={calculateFood} className={styles.form}>
             <label>
               Вид тварини
               <select
@@ -186,21 +222,13 @@ export default function CalculatorPage() {
               </select>
             </label>
 
-            <button
-              type="submit"
-              style={{
-                cursor: "pointer",
-                padding: "10px",
-                border: "1px solid #ccc",
-                background: "#facc15",
-              }}
-            >
-              Розрахувати корм
-            </button>
+            <button type="submit" className={styles.button}>
+  Розрахувати корм
+</button>
           </form>
 
           {foodResult && (
-            <div style={{ marginTop: "20px" }}>
+            <div className={styles.result}>
               <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
                 Рекомендована норма: {foodResult.dailyGrams} г/день
               </h3>
@@ -209,14 +237,19 @@ export default function CalculatorPage() {
                 <p>Підходящий корм не знайдено.</p>
               ) : (
                 foodResult.products.map((product) => (
-                  <div
-                    key={product.id}
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "12px",
-                      marginTop: "12px",
-                    }}
-                  >
+                  <div key={product.id} className={styles.productCard}>
+                    <button
+  type="button"
+  onClick={() => handleToggleFavorite(product.id)}
+  className={styles.favoriteBtn}
+>
+  <Heart
+    size={28}
+    strokeWidth={2}
+    color="#e28f00"
+    fill={favoriteProductIds.includes(product.id) ? "#e39000" : "none"}
+  />
+</button>
                     <h4 style={{ fontWeight: "bold" }}>{product.name}</h4>
                     {product.description && <p>{product.description}</p>}
                     <p>Бренд: {product.brand || "—"}</p>
@@ -224,17 +257,12 @@ export default function CalculatorPage() {
                     <p>Наявність: {product.stock}</p>
 
                     <button
-                      type="button"
-                      onClick={() => addToCart(product.id)}
-                      style={{
-                        cursor: "pointer",
-                        padding: "8px 12px",
-                        border: "1px solid #ccc",
-                        background: "#facc15",
-                      }}
-                    >
-                      У кошик
-                    </button>
+  type="button"
+  onClick={() => addToCart(product.id)}
+  className={styles.cartButton}
+>
+  У кошик
+</button>
                   </div>
                 ))
               )}
@@ -242,12 +270,12 @@ export default function CalculatorPage() {
           )}
         </div>
 
-        <div style={{ background: "white", border: "1px solid #ddd", padding: "20px" }}>
+        <div className={styles.card}>
           <h2 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>
             Калькулятор шлейки
           </h2>
 
-          <form onSubmit={calculateHarness} style={{ display: "grid", gap: "12px" }}>
+          <form onSubmit={calculateHarness} className={styles.form}>
             <label>
               Вид тварини
               <select
@@ -296,52 +324,57 @@ export default function CalculatorPage() {
               />
             </label>
 
-            <button
-              type="submit"
-              style={{
-                cursor: "pointer",
-                padding: "10px",
-                border: "1px solid #ccc",
-                background: "#facc15",
-              }}
-            >
-              Підібрати шлейку
-            </button>
+            <button type="submit" className={styles.button}>
+  Підібрати шлейку
+</button>
           </form>
 
-          <div style={{ marginTop: "20px" }}>
+          <div className={styles.result}>
             <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
               Таблиця розмірів
             </h3>
 
-            <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
-              <tbody>
-                <tr>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>XS</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Шия 15–25 см</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Груди 25–35 см</td>
-                </tr>
-                <tr>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>S</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Шия 20–30 см</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Груди 35–45 см</td>
-                </tr>
-                <tr>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>M</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Шия 30–45 см</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Груди 45–65 см</td>
-                </tr>
-                <tr>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>L</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Шия 40–60 см</td>
-                  <td style={{ border: "1px solid #ddd", padding: "8px" }}>Груди 60–85 см</td>
-                </tr>
-              </tbody>
-            </table>
+            <table className={styles.sizeTable}>
+  <thead>
+    <tr>
+      <th>Розмір</th>
+      <th>Шия</th>
+      <th>Груди</th>
+      <th>Спина</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>XS</td>
+      <td>15–25 см</td>
+      <td>25–35 см</td>
+      <td>20–25 см</td>
+    </tr>
+    <tr>
+      <td>S</td>
+      <td>20–30 см</td>
+      <td>35–45 см</td>
+      <td>25–30 см</td>
+    </tr>
+    <tr>
+      <td>M</td>
+      <td>30–45 см</td>
+      <td>45–65 см</td>
+      <td>30–40 см</td>
+    </tr>
+    <tr>
+      <td>L</td>
+      <td>40–60 см</td>
+      <td>60–85 см</td>
+      <td>40–55 см</td>
+    </tr>
+  </tbody>
+</table>
           </div>
 
           {harnessResult && (
-            <div style={{ marginTop: "20px" }}>
+            <div className={styles.result}>
               <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
                 Рекомендовані шлейки
               </h3>
@@ -350,14 +383,19 @@ export default function CalculatorPage() {
                 <p>Підходящу шлейку не знайдено.</p>
               ) : (
                 harnessResult.products.map((product) => (
-                  <div
-                    key={product.id}
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "12px",
-                      marginTop: "12px",
-                    }}
-                  >
+                  <div key={product.id} className={styles.productCard}>
+                    <button
+  type="button"
+  onClick={() => handleToggleFavorite(product.id)}
+  className={styles.favoriteBtn}
+>
+  <Heart
+    size={28}
+    strokeWidth={2}
+    color="#e28f00"
+    fill={favoriteProductIds.includes(product.id) ? "#e39000" : "none"}
+  />
+</button>
                     <h4 style={{ fontWeight: "bold" }}>{product.name}</h4>
                     <p>Розмір: {product.sizeLabel || "—"}</p>
                     <p>
@@ -370,17 +408,12 @@ export default function CalculatorPage() {
                     <p>Наявність: {product.stock}</p>
 
                     <button
-                      type="button"
-                      onClick={() => addToCart(product.id)}
-                      style={{
-                        cursor: "pointer",
-                        padding: "8px 12px",
-                        border: "1px solid #ccc",
-                        background: "#facc15",
-                      }}
-                    >
-                      У кошик
-                    </button>
+  type="button"
+  onClick={() => addToCart(product.id)}
+  className={styles.cartButton}
+>
+  У кошик
+</button>
                   </div>
                 ))
               )}

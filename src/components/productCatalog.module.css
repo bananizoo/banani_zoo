@@ -115,6 +115,34 @@
   font-weight: 600;
 }
 
+.card {
+  position: relative;
+}
+
+.favoriteBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.favoriteBtn:hover {
+  transform: scale(1.15);
+}
+
 /* Пастельні кольори */
 .badgeType {
   background: #fff1cc;   /* ніжно-жовтий */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./compare.module.css";
 
 type Product = {
   id: string;
@@ -103,19 +104,19 @@ export default function ComparePage() {
 
   if (message) {
     return (
-      <section style={{ marginTop: "24px" }}>
-        <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "16px" }}>
+      <section className={styles.wrapper}>
+        <h1 className={styles.title}>
           Порівняння товарів
         </h1>
-        <p>{message}</p>
+        <p className={styles.messageBox}>{message}</p>
       </section>
     );
   }
 
   if (favorites.length < 2) {
     return (
-      <section style={{ marginTop: "24px" }}>
-        <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "16px" }}>
+      <section className={styles.wrapper}>
+        <h1 className={styles.title}>
           Порівняння товарів
         </h1>
 
@@ -127,41 +128,22 @@ export default function ComparePage() {
   }
 
   return (
-    <section style={{ marginTop: "24px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "20px" }}>
+    <section className={styles.wrapper}>
+      <h1 className={styles.title}>
         Порівняння товарів
       </h1>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "24px",
-          marginBottom: "24px",
-        }}
-      >
-        <div
-          style={{
-            border: "2px dashed #999",
-            padding: "20px",
-            background: "#fff",
-            minHeight: "180px",
-          }}
-        >
+      <div className={styles.selectGrid}>
+        <div className={styles.selectCard}>
           <h2 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "12px" }}>
             Товар 1
           </h2>
 
           <select
-            value={firstProductId}
-            onChange={(e) => setFirstProductId(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              marginBottom: "16px",
-            }}
-          >
+  value={firstProductId}
+  onChange={(e) => setFirstProductId(e.target.value)}
+  className={styles.selectInput}
+>
             <option value="">Додати товар</option>
 
             {favorites.map((item) => (
@@ -176,7 +158,7 @@ export default function ComparePage() {
           </select>
 
           {firstProduct && (
-            <div>
+            <div className={styles.preview}>
               <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
                 {firstProduct.name}
               </h3>
@@ -188,28 +170,16 @@ export default function ComparePage() {
           )}
         </div>
 
-        <div
-          style={{
-            border: "2px dashed #999",
-            padding: "20px",
-            background: "#fff",
-            minHeight: "180px",
-          }}
-        >
+        <div className={styles.selectCard}>
           <h2 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "12px" }}>
             Товар 2
           </h2>
 
           <select
-            value={secondProductId}
-            onChange={(e) => setSecondProductId(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              border: "1px solid #ccc",
-              marginBottom: "16px",
-            }}
-          >
+  value={secondProductId}
+  onChange={(e) => setSecondProductId(e.target.value)}
+  className={styles.selectInput}
+>
             <option value="">Додати товар</option>
 
             {favorites.map((item) => (
@@ -224,7 +194,7 @@ export default function ComparePage() {
           </select>
 
           {secondProduct && (
-            <div>
+            <div className={styles.preview}>
               <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
                 {secondProduct.name}
               </h3>
@@ -238,24 +208,12 @@ export default function ComparePage() {
       </div>
 
       {firstProduct && secondProduct && (
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid #ddd",
-            padding: "20px",
-          }}
-        >
-          <h2 style={{ fontSize: "26px", fontWeight: "bold", marginBottom: "16px" }}>
+        <div className={styles.resultBox}>
+          <h2 className={styles.resultTitle}>
             Результат порівняння
           </h2>
 
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginBottom: "20px",
-            }}
-          >
+          <table className={styles.compareTable}>
             <tbody>
               <tr>
                 <td style={{ border: "1px solid #ddd", padding: "10px" }}>
@@ -399,13 +357,7 @@ export default function ComparePage() {
             </tbody>
           </table>
 
-          <div
-            style={{
-              border: "1px solid #ddd",
-              padding: "16px",
-              background: "#fffdf2",
-            }}
-          >
+          <div className={styles.conclusion}>
             <h3 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "10px" }}>
               Висновок
             </h3>

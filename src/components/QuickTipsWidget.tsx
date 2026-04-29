@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./quickTipsWidget.module.css";
 
 type Tip = {
   id: string;
@@ -55,95 +56,52 @@ export default function QuickTipsWidget() {
   return (
     <>
       <button
-        type="button"
-        onClick={handleClick}
-        style={{
-          position: "fixed",
-          left: "20px",
-          bottom: "20px",
-          width: "64px",
-          height: "64px",
-          border: "1px solid #ccc",
-          background: "#fff",
-          cursor: "pointer",
-          zIndex: 1000,
-        }}
-      >
-        💡
-      </button>
+  type="button"
+  onClick={handleClick}
+  className={styles.tipButton}
+>
+  💡
+</button>
 
       {isOpen && (
-        <div
-          style={{
-            position: "fixed",
-            left: "20px",
-            bottom: "95px",
-            width: "320px",
-            background: "#fff",
-            border: "1px solid #ddd",
-            padding: "16px",
-            zIndex: 1001,
-            boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-          }}
+  <div className={styles.tipModal}>
+    <div className={styles.tipHeader}>
+      <strong className={styles.tipLabel}>Швидка порада</strong>
+
+      <button
+        type="button"
+        onClick={() => setIsOpen(false)}
+        className={styles.closeButton}
+      >
+        ✕
+      </button>
+    </div>
+
+    {loading && <p className={styles.text}>Завантаження...</p>}
+
+    {!loading && message && <p className={styles.text}>{message}</p>}
+
+    {!loading && tip && (
+      <>
+        {tip.category && (
+          <p className={styles.category}>{tip.category}</p>
+        )}
+
+        <h3 className={styles.title}>{tip.title}</h3>
+
+        <p className={styles.text}>{tip.content}</p>
+
+        <button
+          type="button"
+          onClick={loadRandomTip}
+          className={styles.nextButton}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "12px",
-              marginBottom: "10px",
-            }}
-          >
-            <strong>Швидка порада</strong>
-
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              style={{
-                cursor: "pointer",
-                border: "none",
-                background: "transparent",
-              }}
-            >
-              ✕
-            </button>
-          </div>
-
-          {loading && <p>Завантаження...</p>}
-
-          {!loading && message && <p>{message}</p>}
-
-          {!loading && tip && (
-            <>
-              {tip.category && (
-                <p style={{ fontSize: "12px", opacity: 0.7 }}>
-                  {tip.category}
-                </p>
-              )}
-
-              <h3 style={{ fontSize: "18px", fontWeight: "bold" }}>
-                {tip.title}
-              </h3>
-
-              <p style={{ marginTop: "8px" }}>{tip.content}</p>
-
-              <button
-                type="button"
-                onClick={loadRandomTip}
-                style={{
-                  marginTop: "12px",
-                  cursor: "pointer",
-                  padding: "8px 12px",
-                  border: "1px solid #ccc",
-                  background: "#facc15",
-                }}
-              >
-                Інша порада
-              </button>
-            </>
-          )}
-        </div>
-      )}
+          Наступна порада
+        </button>
+      </>
+    )}
+  </div>
+)}
     </>
   );
 }

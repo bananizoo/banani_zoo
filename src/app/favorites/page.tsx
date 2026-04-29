@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./favorites.module.css";
+import { Heart } from "lucide-react";
 
 type FavoriteItem = {
   id: string;
@@ -94,10 +96,10 @@ export default function FavoritesPage() {
   }
 
   return (
-    <section style={{ marginTop: "24px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "20px" }}>
-        Обране
-      </h1>
+    <section className={styles.wrapper}>
+      <h1 className={styles.title}>
+  Обране
+</h1>
 
       {message && <p>{message}</p>}
 
@@ -105,62 +107,56 @@ export default function FavoritesPage() {
         <p>Список обраного порожній</p>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+      <div className={styles.grid}>
         {favorites.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              background: "white",
-              border: "1px solid #facc15",
-              padding: "20px",
-              borderRadius: "16px",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => removeFromFavorites(item.productId)}
-              style={{
-                float: "right",
-                cursor: "pointer",
-                border: "none",
-                background: "transparent",
-                fontSize: "24px",
-              }}
-            >
-              ❤️
-            </button>
+          <div key={item.id} className={styles.card}>
+<button
+  type="button"
+  onClick={() => removeFromFavorites(item.productId)}
+  className={styles.favoriteBtn}
+>
+  <Heart
+    size={28}
+    strokeWidth={2}
+    color="#e28f00"
+    fill="#e39000"
+  />
+</button>
 
-            <p style={{ fontSize: "12px", opacity: 0.7 }}>
-              {item.product.category.name}
-            </p>
+<div className={styles.badges}>
+  <span className={`${styles.badge} ${styles.badgeType}`}>
+    {item.product.category.name}
+  </span>
 
-            <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
-              {item.product.name}
-            </h3>
+  <span className={`${styles.badge} ${styles.badgePet}`}>
+    {item.product.petType === "DOG" && "Собака"}
+    {item.product.petType === "CAT" && "Кіт"}
+  </span>
+</div>
 
-            {item.product.description && <p>{item.product.description}</p>}
+            <h3 className={styles.name}>
+  {item.product.name}
+</h3>
+
+            {item.product.description && (
+  <p className={styles.desc}>{item.product.description}</p>
+)}
 
             <p><b>Бренд:</b> {item.product.brand}</p>
             <p><b>Тип товару:</b> {item.product.productType}</p>
             <p><b>Тип тварини:</b> {item.product.petType}</p>
             <p><b>Наявність:</b> {item.product.stock}</p>
 
-            <p style={{ fontSize: "24px", fontWeight: "bold", color: "#ea580c" }}>
-              {item.product.price} ₴
-            </p>
+            <p className={styles.price}>
+  {item.product.price} ₴
+</p>
             <button
-              type="button"
-              onClick={() => handleAddToCart(item.product.id)}
-              style={{
-                cursor: "pointer",
-                padding: "8px 14px",
-                border: "1px solid #ccc",
-                background: "#facc15",
-                marginTop: "10px",
-              }}
-            >
-              У кошик
-            </button>
+  type="button"
+  onClick={() => handleAddToCart(item.product.id)}
+  className={styles.button}
+>
+  У кошик
+</button>
           </div>
         ))}
       </div>
