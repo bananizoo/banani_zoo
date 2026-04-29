@@ -62,65 +62,50 @@ export async function POST(request: NextRequest) {
     }
 
     if (calculatorType === "harness") {
-      const { petType, neckCm, chestCm, backLengthCm } = body;
+  const { petType, neckCm, chestCm, backLengthCm } = body;
 
-      const neck = Number(neckCm);
-      const chest = Number(chestCm);
+  const neck = Number(neckCm);
+  const chest = Number(chestCm);
 
-      if (!petType || !neck || !chest) {
-        return NextResponse.json(
-          { error: "Вкажіть тип тварини, обхват шиї та грудей" },
-          { status: 400 }
-        );
-      }
+  if (!petType || !neck || !chest) {
+    return NextResponse.json(
+      { error: "Вкажіть тип тварини, обхват шиї та грудей" },
+      { status: 400 }
+    );
+  }
 
-      let products = await prisma.product.findMany({
-        where: {
-          isActive: true,
-          stock: { gt: 0 },
-          productType: "HARNESS",
-          petType,
-          neckMinCm: { lte: neck },
-          neckMaxCm: { gte: neck },
-          chestMinCm: { lte: chest },
-          chestMaxCm: { gte: chest },
-        },
-        include: {
-          category: true,
-        },
-        orderBy: [
-          { searchBoost: "desc" },
-          { price: "asc" },
-        ],
-        take: 3,
-      });
+  const tolerance = 3;
 
-      if (products.length === 0) {
-        products = await prisma.product.findMany({
-          where: {
-            isActive: true,
-            stock: { gt: 0 },
-            productType: "HARNESS",
-            petType,
-          },
-          include: {
-            category: true,
-          },
-          orderBy: [
-            { searchBoost: "desc" },
-            { price: "asc" },
-          ],
-          take: 3,
-        });
-      }
+  const products = await prisma.product.findMany({
+    where: {
+      isActive: true,
+      stock: { gt: 0 },
+      productType: "HARNESS",
+      petType,
 
-      return NextResponse.json({
-        neckCm: neck,
-        chestCm: chest,
-        backLengthCm: backLengthCm ? Number(backLengthCm) : null,
-        products,
-      });
-    }
+      neckMinCm: { lte: neck + tolerance },
+      neckMaxCm: { gte: neck - tolerance },
+
+      chestMinCm: { lte: chest + tolerance },
+      chestMaxCm: { gte: chest - tolerance },
+    },
+    include: {
+      category: true,
+    },
+    orderBy: [
+      { searchBoost: "desc" },
+      { price: "asc" },
+    ],
+    take: 3,
+  });
+
+  return NextResponse.json({
+    neckCm: neck,
+    chestCm: chest,
+    backLengthCm: backLengthCm ? Number(backLengthCm) : null,
+    products,
+  });
+}
 
     return NextResponse.json(
       { error: "Невідомий калькулятор" },

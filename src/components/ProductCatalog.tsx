@@ -107,8 +107,14 @@ export default function ProductCatalog() {
   }
 
   function resetFilters() {
-    router.push("/");
-  }
+  setSort("newest");
+  setPetType("");
+  setProductType("");
+  setPage(1);
+  setHasMore(true);
+
+  router.push("/");
+}
 
 async function handleAddToCart(product: Product) {
   const response = await fetch("/api/cart/add", {
@@ -232,7 +238,13 @@ async function handleToggleFavorite(productId: string) {
       </div>
 
       <div className={styles.grid}>
-        {products.map((product) => (
+  {products.length === 0 ? (
+    <div className={styles.emptyMessage}>
+      <h3>Товар не знайдено</h3>
+      <p>Спробуйте змінити запит або скинути фільтри.</p>
+    </div>
+  ) : (
+    products.map((product) => (
           <div key={product.id} className={styles.card}>
 <button
   type="button"
@@ -298,7 +310,8 @@ async function handleToggleFavorite(productId: string) {
               </button>
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
 
       {/* ✅ КНОПКА ПАГІНАЦІЇ */}

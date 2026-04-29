@@ -20,6 +20,13 @@ type Product = {
   chestMaxCm: number | null;
 };
 
+type HarnessSizeRow = {
+  size: string;
+  neck: string;
+  chest: string;
+  back: string;
+};
+
 export default function CalculatorPage() {
   const [foodPetType, setFoodPetType] = useState("CAT");
   const [weightKg, setWeightKg] = useState("");
@@ -41,46 +48,62 @@ export default function CalculatorPage() {
   } | null>(null);
 
   const [message, setMessage] = useState("");
-
   const [favoriteProductIds, setFavoriteProductIds] = useState<string[]>([]);
 
-async function loadFavorites() {
-  const response = await fetch("/api/favorites", {
-    credentials: "include",
-  });
+  const dogSizes: HarnessSizeRow[] = [
+    { size: "XS", neck: "15–25 см", chest: "25–35 см", back: "20–25 см" },
+    { size: "S", neck: "20–30 см", chest: "35–45 см", back: "25–30 см" },
+    { size: "M", neck: "30–45 см", chest: "45–65 см", back: "30–40 см" },
+    { size: "L", neck: "40–60 см", chest: "60–85 см", back: "40–55 см" },
+  ];
 
-  if (!response.ok) {
-    setFavoriteProductIds([]);
-    return;
+  const catSizes: HarnessSizeRow[] = [
+    { size: "XS", neck: "16–24 см", chest: "24–35 см", back: "18–25 см" },
+    { size: "S", neck: "20–28 см", chest: "30–42 см", back: "22–30 см" },
+    { size: "M", neck: "24–34 см", chest: "38–50 см", back: "28–36 см" },
+  ];
+
+  const sizeRows = harnessPetType === "CAT" ? catSizes : dogSizes;
+
+  async function loadFavorites() {
+    const response = await fetch("/api/favorites", {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      setFavoriteProductIds([]);
+      return;
+    }
+
+    const data = await response.json();
+
+    setFavoriteProductIds(data.favorites.map((item: any) => item.productId));
   }
 
-  const data = await response.json();
+  useEffect(() => {
+    loadFavorites();
+  }, []);
 
-  setFavoriteProductIds(
-    data.favorites.map((item: any) => item.productId)
-  );
-}
+  async function handleToggleFavorite(productId: string) {
+    const isFavorite = favoriteProductIds.includes(productId);
 
-async function handleToggleFavorite(productId: string) {
-  const isFavorite = favoriteProductIds.includes(productId);
+    const response = await fetch("/api/favorites", {
+      method: isFavorite ? "DELETE" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ productId }),
+    });
 
-  const response = await fetch("/api/favorites", {
-    method: isFavorite ? "DELETE" : "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({ productId }),
-  });
+    if (!response.ok) {
+      alert("Щоб додати товар в обране, потрібно увійти в акаунт");
+      return;
+    }
 
-  if (!response.ok) {
-    alert("Щоб додати товар в обране, потрібно увійти в акаунт");
-    return;
+    await loadFavorites();
+    window.dispatchEvent(new Event("favorites-updated"));
   }
-
-  await loadFavorites();
-  window.dispatchEvent(new Event("favorites-updated"));
-}
 
   async function addToCart(productId: string) {
     const response = await fetch("/api/cart/add", {
@@ -159,9 +182,7 @@ async function handleToggleFavorite(productId: string) {
 
   return (
     <section className={styles.wrapper}>
-      <h1 className={styles.title}>
-  Калькулятори для тварин
-</h1>
+      <h1 className={styles.title}>Калькулятори для тварин</h1>
 
       {message && <p className={styles.message}>{message}</p>}
 
@@ -175,10 +196,10 @@ async function handleToggleFavorite(productId: string) {
             <label>
               Вид тварини
               <select
-  value={foodPetType}
-  onChange={(e) => setFoodPetType(e.target.value)}
-  className={styles.formInput}
->
+                value={foodPetType}
+                onChange={(e) => setFoodPetType(e.target.value)}
+                className={styles.formInput}
+              >
                 <option value="CAT">Кіт</option>
                 <option value="DOG">Собака</option>
               </select>
@@ -223,8 +244,8 @@ async function handleToggleFavorite(productId: string) {
             </label>
 
             <button type="submit" className={styles.button}>
-  Розрахувати корм
-</button>
+              Розрахувати корм
+            </button>
           </form>
 
           {foodResult && (
@@ -239,17 +260,22 @@ async function handleToggleFavorite(productId: string) {
                 foodResult.products.map((product) => (
                   <div key={product.id} className={styles.productCard}>
                     <button
-  type="button"
-  onClick={() => handleToggleFavorite(product.id)}
-  className={styles.favoriteBtn}
->
-  <Heart
-    size={28}
-    strokeWidth={2}
-    color="#e28f00"
-    fill={favoriteProductIds.includes(product.id) ? "#e39000" : "none"}
-  />
-</button>
+                      type="button"
+                      onClick={() => handleToggleFavorite(product.id)}
+                      className={styles.favoriteBtn}
+                    >
+                      <Heart
+                        size={28}
+                        strokeWidth={2}
+                        color="#e28f00"
+                        fill={
+                          favoriteProductIds.includes(product.id)
+                            ? "#e39000"
+                            : "none"
+                        }
+                      />
+                    </button>
+
                     <h4 style={{ fontWeight: "bold" }}>{product.name}</h4>
                     {product.description && <p>{product.description}</p>}
                     <p>Бренд: {product.brand || "—"}</p>
@@ -257,12 +283,12 @@ async function handleToggleFavorite(productId: string) {
                     <p>Наявність: {product.stock}</p>
 
                     <button
-  type="button"
-  onClick={() => addToCart(product.id)}
-  className={styles.cartButton}
->
-  У кошик
-</button>
+                      type="button"
+                      onClick={() => addToCart(product.id)}
+                      className={styles.cartButton}
+                    >
+                      У кошик
+                    </button>
                   </div>
                 ))
               )}
@@ -325,8 +351,8 @@ async function handleToggleFavorite(productId: string) {
             </label>
 
             <button type="submit" className={styles.button}>
-  Підібрати шлейку
-</button>
+              Підібрати шлейку
+            </button>
           </form>
 
           <div className={styles.result}>
@@ -335,42 +361,26 @@ async function handleToggleFavorite(productId: string) {
             </h3>
 
             <table className={styles.sizeTable}>
-  <thead>
-    <tr>
-      <th>Розмір</th>
-      <th>Шия</th>
-      <th>Груди</th>
-      <th>Спина</th>
-    </tr>
-  </thead>
+              <thead>
+                <tr>
+                  <th>Розмір</th>
+                  <th>Шия</th>
+                  <th>Груди</th>
+                  <th>Спина</th>
+                </tr>
+              </thead>
 
-  <tbody>
-    <tr>
-      <td>XS</td>
-      <td>15–25 см</td>
-      <td>25–35 см</td>
-      <td>20–25 см</td>
-    </tr>
-    <tr>
-      <td>S</td>
-      <td>20–30 см</td>
-      <td>35–45 см</td>
-      <td>25–30 см</td>
-    </tr>
-    <tr>
-      <td>M</td>
-      <td>30–45 см</td>
-      <td>45–65 см</td>
-      <td>30–40 см</td>
-    </tr>
-    <tr>
-      <td>L</td>
-      <td>40–60 см</td>
-      <td>60–85 см</td>
-      <td>40–55 см</td>
-    </tr>
-  </tbody>
-</table>
+              <tbody>
+                {sizeRows.map((row) => (
+                  <tr key={row.size}>
+                    <td>{row.size}</td>
+                    <td>{row.neck}</td>
+                    <td>{row.chest}</td>
+                    <td>{row.back}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {harnessResult && (
@@ -380,22 +390,27 @@ async function handleToggleFavorite(productId: string) {
               </h3>
 
               {harnessResult.products.length === 0 ? (
-                <p>Підходящу шлейку не знайдено.</p>
+                <p>Шлейку зі вказаними розмірами не знайдено.</p>
               ) : (
                 harnessResult.products.map((product) => (
                   <div key={product.id} className={styles.productCard}>
                     <button
-  type="button"
-  onClick={() => handleToggleFavorite(product.id)}
-  className={styles.favoriteBtn}
->
-  <Heart
-    size={28}
-    strokeWidth={2}
-    color="#e28f00"
-    fill={favoriteProductIds.includes(product.id) ? "#e39000" : "none"}
-  />
-</button>
+                      type="button"
+                      onClick={() => handleToggleFavorite(product.id)}
+                      className={styles.favoriteBtn}
+                    >
+                      <Heart
+                        size={28}
+                        strokeWidth={2}
+                        color="#e28f00"
+                        fill={
+                          favoriteProductIds.includes(product.id)
+                            ? "#e39000"
+                            : "none"
+                        }
+                      />
+                    </button>
+
                     <h4 style={{ fontWeight: "bold" }}>{product.name}</h4>
                     <p>Розмір: {product.sizeLabel || "—"}</p>
                     <p>
@@ -408,12 +423,12 @@ async function handleToggleFavorite(productId: string) {
                     <p>Наявність: {product.stock}</p>
 
                     <button
-  type="button"
-  onClick={() => addToCart(product.id)}
-  className={styles.cartButton}
->
-  У кошик
-</button>
+                      type="button"
+                      onClick={() => addToCart(product.id)}
+                      className={styles.cartButton}
+                    >
+                      У кошик
+                    </button>
                   </div>
                 ))
               )}
