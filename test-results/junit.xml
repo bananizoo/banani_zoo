@@ -1,0 +1,34 @@
+<testsuites id="" name="" tests="12" failures="0" skipped="0" errors="0" time="24.520542">
+<testsuite name="user1.test.js" timestamp="2026-05-03T11:59:23.663Z" hostname="" tests="3" failures="0" skipped="0" time="7.065" errors="0">
+<testcase name="User 1 Tests - BaNaNi Zoo › Home page loads successfully" classname="user1.test.js" time="4.177">
+</testcase>
+<testcase name="User 1 Tests - BaNaNi Zoo › Navigation to About page works" classname="user1.test.js" time="1.723">
+</testcase>
+<testcase name="User 1 Tests - BaNaNi Zoo › Footer contains navigation links" classname="user1.test.js" time="1.165">
+</testcase>
+</testsuite>
+<testsuite name="user2.test.js" timestamp="2026-05-03T11:59:23.663Z" hostname="" tests="3" failures="0" skipped="0" time="9.855" errors="0">
+<testcase name="User 2 Tests - BaNaNi Zoo › Add product to cart and open cart drawer" classname="user2.test.js" time="6.366">
+</testcase>
+<testcase name="User 2 Tests - BaNaNi Zoo › Favorites page shows authentication message" classname="user2.test.js" time="1.162">
+</testcase>
+<testcase name="User 2 Tests - BaNaNi Zoo › Checkout button shows auth warning" classname="user2.test.js" time="2.327">
+</testcase>
+</testsuite>
+<testsuite name="user3.test.js" timestamp="2026-05-03T11:59:23.663Z" hostname="" tests="3" failures="0" skipped="0" time="7.952" errors="0">
+<testcase name="User 3 Tests - BaNaNi Zoo › Search functionality returns products" classname="user3.test.js" time="5.532">
+</testcase>
+<testcase name="User 3 Tests - BaNaNi Zoo › Compare page loads" classname="user3.test.js" time="1.524">
+</testcase>
+<testcase name="User 3 Tests - BaNaNi Zoo › Non-existent route shows error or 404" classname="user3.test.js" time="0.896">
+</testcase>
+</testsuite>
+<testsuite name="user4.test.js" timestamp="2026-05-03T11:59:23.663Z" hostname="" tests="3" failures="0" skipped="0" time="7.007" errors="0">
+<testcase name="User 4 Tests - BaNaNi Zoo › Auth popup opens when clicking profile icon" classname="user4.test.js" time="4.395">
+</testcase>
+<testcase name="User 4 Tests - BaNaNi Zoo › Footer is present with navigation" classname="user4.test.js" time="1.152">
+</testcase>
+<testcase name="User 4 Tests - BaNaNi Zoo › Favorites page shows login prompt" classname="user4.test.js" time="1.46">
+</testcase>
+</testsuite>
+</testsuites>
